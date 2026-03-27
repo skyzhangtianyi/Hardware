@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI硬件众筹深度报告 2024-2025</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Noto+Sans+SC:wght@300;400;500;700;900&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#050810;--bg2:#0a0f1e;--bg3:#0f1628;
+  --cyan:#00f5ff;--purple:#7c3aed;--pink:#f472b6;
+  --amber:#fbbf24;--green:#10b981;--red:#ef4444;
+  --text:#e2e8f0;--muted:#64748b;
+  --border:rgba(0,245,255,0.15);
+  --glow-cyan:0 0 20px rgba(0,245,255,0.4);
+  --glow-purple:0 0 20px rgba(124,58,237,0.5);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans SC',sans-serif;overflow-x:hidden;line-height:1.6;}
+body::before{content:'';position:fixed;inset:0;z-index:9999;pointer-events:none;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.03) 2px,rgba(0,0,0,0.03) 4px);}
+
+/* NAV */
+#nav{position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(5,8,16,0.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:60px;transform:translateY(-100%);transition:transform 0.4s ease;}
+#nav.visible{transform:translateY(0);}
+.nav-logo{font-family:'Orbitron',sans-serif;font-size:0.85rem;font-weight:700;color:var(--cyan);}
+.nav-links{display:flex;gap:0.2rem;list-style:none;}
+.nav-links a{font-family:'Space Mono',monospace;font-size:0.65rem;text-decoration:none;color:var(--muted);letter-spacing:0.1em;padding:0.4rem 0.8rem;border-radius:4px;transition:all 0.2s;text-transform:uppercase;}
+.nav-links a:hover{color:var(--cyan);background:rgba(0,245,255,0.08);}
+.nav-links a.active{color:var(--cyan);background:rgba(0,245,255,0.1);}
+
+/* HERO */
+#hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(124,58,237,0.2) 0%,transparent 70%),radial-gradient(ellipse 60% 40% at 80% 80%,rgba(0,245,255,0.1) 0%,transparent 60%),var(--bg);}
+#hero canvas{position:absolute;inset:0;opacity:0.4;}
+.hero-content{position:relative;z-index:10;text-align:center;padding:2rem;}
+.hero-tag{font-family:'Space Mono',monospace;font-size:0.7rem;letter-spacing:0.3em;color:var(--cyan);text-transform:uppercase;border:1px solid var(--border);padding:0.4rem 1.2rem;border-radius:100px;display:inline-block;margin-bottom:2rem;background:rgba(0,245,255,0.05);animation:pulse-border 3s ease-in-out infinite;}
+@keyframes pulse-border{0%,100%{border-color:rgba(0,245,255,0.15);box-shadow:0 0 0 rgba(0,245,255,0);}50%{border-color:rgba(0,245,255,0.5);box-shadow:0 0 20px rgba(0,245,255,0.15);}}
+.hero-title{font-family:'Orbitron',sans-serif;font-size:clamp(2.5rem,6vw,5rem);font-weight:900;line-height:1.1;letter-spacing:-0.02em;background:linear-gradient(135deg,#fff 30%,var(--cyan) 70%,var(--purple) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:1rem;}
+.hero-sub{font-size:1.1rem;color:var(--muted);max-width:600px;margin:0 auto 3rem;font-weight:300;letter-spacing:0.05em;}
+.hero-stats{display:flex;gap:3rem;justify-content:center;margin-bottom:3rem;}
+.stat{text-align:center;}
+.stat-num{font-family:'Orbitron',sans-serif;font-size:2.5rem;font-weight:900;color:var(--cyan);text-shadow:var(--glow-cyan);}
+.stat-label{font-size:0.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.2em;}
+.hero-scroll{font-family:'Space Mono',monospace;font-size:0.7rem;color:var(--muted);letter-spacing:0.2em;text-transform:uppercase;display:flex;align-items:center;gap:0.5rem;animation:bob 2s ease-in-out infinite;}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(6px)}}
+
+/* SECTION */
+section{padding:6rem 2rem;max-width:1400px;margin:0 auto;}
+.section-header{margin-bottom:4rem;}
+.section-tag{font-family:'Space Mono',monospace;font-size:0.65rem;letter-spacing:0.3em;color:var(--cyan);text-transform:uppercase;margin-bottom:0.75rem;display:block;}
+.section-title{font-family:'Orbitron',sans-serif;font-size:clamp(1.8rem,4vw,3rem);font-weight:700;line-height:1.2;margin-bottom:1rem;}
+.section-desc{font-size:1rem;color:var(--muted);max-width:700px;line-height:1.8;}
+.full-divider{width:100%;height:1px;background:linear-gradient(90deg,transparent,var(--border) 20%,var(--cyan) 50%,var(--border) 80%,transparent);}
+
+/* SPOTLIGHT — featured 5 */
+#spotlight{padding:4rem 2rem 2rem;max-width:1400px;margin:0 auto;}
+.spotlight-header{display:flex;align-items:baseline;gap:1.5rem;margin-bottom:2rem;}
+.spotlight-title{font-family:'Orbitron',sans-serif;font-size:1.4rem;font-weight:700;color:var(--amber);}
+.spotlight-sub{font-family:'Space Mono',monospace;font-size:0.62rem;color:var(--muted);letter-spacing:0.15em;text-transform:uppercase;}
+.spotlight-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:rgba(251,191,36,0.2);}
+.spotlight-card{background:var(--bg2);padding:1.5rem;cursor:pointer;transition:all 0.25s;position:relative;overflow:hidden;border-top:2px solid rgba(251,191,36,0.6);}
+.spotlight-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(251,191,36,0.04),transparent);opacity:0;transition:opacity 0.25s;}
+.spotlight-card:hover{background:var(--bg3);}
+.spotlight-card:hover::before{opacity:1;}
+.sp-rank{font-family:'Orbitron',sans-serif;font-size:0.55rem;color:var(--amber);letter-spacing:0.2em;margin-bottom:0.5rem;opacity:0.7;}
+.sp-emoji{font-size:1.6rem;margin-bottom:0.6rem;display:block;}
+.sp-name{font-size:0.88rem;font-weight:700;margin-bottom:0.4rem;line-height:1.3;}
+.sp-hook{font-size:0.7rem;color:var(--muted);line-height:1.5;}
+.sp-stars{margin-top:0.75rem;color:var(--amber);font-size:0.75rem;text-shadow:0 0 6px rgba(251,191,36,0.4);}
+
+/* PRODUCTS GRID */
+.products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1px;background:var(--border);border:1px solid var(--border);}
+.product-card{background:var(--bg2);padding:1.5rem;cursor:pointer;transition:all 0.3s;position:relative;overflow:hidden;}
+.product-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--purple),var(--cyan));transform:scaleX(0);transform-origin:left;transition:transform 0.3s;}
+.product-card:hover{background:var(--bg3);transform:translateY(-2px);}
+.product-card:hover::before{transform:scaleX(1);}
+.card-num{font-family:'Orbitron',sans-serif;font-size:0.6rem;color:var(--muted);letter-spacing:0.2em;margin-bottom:0.5rem;}
+.card-emoji{font-size:1.8rem;margin-bottom:0.75rem;display:block;}
+.card-name{font-size:0.95rem;font-weight:700;margin-bottom:0.4rem;line-height:1.3;}
+.card-hook{font-size:0.75rem;color:var(--muted);line-height:1.5;margin-bottom:1rem;}
+.card-meta{display:flex;justify-content:space-between;align-items:center;}
+.card-amount{font-family:'Space Mono',monospace;font-size:0.75rem;color:var(--cyan);}
+.card-badge{font-size:0.6rem;letter-spacing:0.1em;padding:0.2rem 0.6rem;border-radius:100px;text-transform:uppercase;font-weight:700;}
+.badge-done{background:rgba(16,185,129,0.15);color:var(--green);border:1px solid rgba(16,185,129,0.3);}
+.badge-active{background:rgba(0,245,255,0.1);color:var(--cyan);border:1px solid var(--border);}
+.badge-ship{background:rgba(251,191,36,0.1);color:var(--amber);border:1px solid rgba(251,191,36,0.3);}
+.card-cat{font-size:0.6rem;color:var(--purple);letter-spacing:0.1em;text-transform:uppercase;margin-top:0.5rem;}
+.card-stars{font-size:0.7rem;color:var(--amber);margin-top:0.3rem;}
+.card-links{margin-top:0.6rem;display:flex;gap:0.4rem;flex-wrap:wrap;}
+.card-link{font-family:'Space Mono',monospace;font-size:0.55rem;padding:0.15rem 0.5rem;border:1px solid var(--border);border-radius:100px;color:var(--muted);text-decoration:none;transition:all 0.15s;}
+.card-link:hover{border-color:var(--cyan);color:var(--cyan);}
+
+/* FILTER */
+.filter-row{display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1.5rem;}
+.filter-btn{font-family:'Space Mono',monospace;font-size:0.65rem;letter-spacing:0.1em;padding:0.4rem 1rem;border-radius:100px;border:1px solid var(--border);background:none;color:var(--muted);cursor:pointer;transition:all 0.2s;text-transform:uppercase;}
+.filter-btn:hover{border-color:var(--cyan);color:var(--cyan);}
+.filter-btn.active{background:rgba(0,245,255,0.1);border-color:var(--cyan);color:var(--cyan);}
+
+/* MODAL */
+#modal-overlay{position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,0.8);backdrop-filter:blur(10px);display:none;align-items:center;justify-content:center;padding:2rem;}
+#modal-overlay.open{display:flex;}
+#modal{background:var(--bg3);border:1px solid var(--border);max-width:700px;width:100%;max-height:85vh;overflow-y:auto;border-radius:8px;position:relative;box-shadow:0 0 60px rgba(0,245,255,0.1);}
+.modal-header{padding:2rem 2rem 1.5rem;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg3);display:flex;justify-content:space-between;align-items:flex-start;}
+.modal-emoji{font-size:2.5rem;}
+.modal-title{font-size:1.4rem;font-weight:700;margin:0.5rem 0 0.25rem;}
+.modal-tag{font-size:0.7rem;color:var(--cyan);font-family:'Space Mono',monospace;}
+.modal-close{background:none;border:none;color:var(--muted);font-size:1.5rem;cursor:pointer;padding:0.25rem;transition:color 0.2s;}
+.modal-close:hover{color:var(--text);}
+.modal-body{padding:2rem;}
+.modal-section{margin-bottom:2rem;}
+.modal-section-title{font-family:'Space Mono',monospace;font-size:0.65rem;color:var(--cyan);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:0.75rem;}
+.modal-section p{font-size:0.9rem;color:var(--muted);line-height:1.8;}
+.modal-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+.modal-metric{background:var(--bg2);border:1px solid var(--border);padding:1rem;border-radius:4px;}
+.metric-label{font-size:0.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;}
+.metric-value{font-family:'Orbitron',sans-serif;font-size:1.1rem;color:var(--cyan);margin-top:0.25rem;}
+.barrier-list{list-style:none;}
+.barrier-list li{display:flex;align-items:flex-start;gap:0.75rem;padding:0.75rem 0;border-bottom:1px solid rgba(255,255,255,0.05);font-size:0.85rem;color:var(--muted);}
+.barrier-icon{font-size:1rem;flex-shrink:0;}
+.barrier-title{font-weight:600;color:var(--text);margin-bottom:0.2rem;font-size:0.85rem;}
+.survival-bar{background:var(--bg2);border:1px solid var(--border);padding:1.25rem;border-radius:4px;margin-top:0.75rem;}
+.sbar-label{font-size:0.75rem;color:var(--muted);margin-bottom:0.5rem;}
+.sbar-track{height:6px;background:rgba(255,255,255,0.08);border-radius:100px;overflow:hidden;}
+.sbar-fill{height:100%;border-radius:100px;}
+.sbar-high{background:linear-gradient(90deg,var(--green),#34d399);}
+.sbar-mid{background:linear-gradient(90deg,var(--amber),#f59e0b);}
+.sbar-low{background:linear-gradient(90deg,var(--red),#f87171);}
+.modal-links{display:flex;gap:0.6rem;flex-wrap:wrap;margin-top:0.75rem;}
+.modal-link{display:inline-flex;align-items:center;gap:0.35rem;font-family:'Space Mono',monospace;font-size:0.65rem;padding:0.35rem 0.75rem;border:1px solid var(--border);border-radius:6px;color:var(--muted);text-decoration:none;transition:all 0.2s;}
+.modal-link:hover{border-color:var(--cyan);color:var(--cyan);background:rgba(0,245,255,0.06);}
+
+/* ANALYSIS */
+.analysis-container{display:grid;grid-template-columns:1fr 1fr;gap:2px;background:var(--border);margin-bottom:2px;}
+.analysis-block{background:var(--bg2);padding:2.5rem;}
+.analysis-block.full{grid-column:1/-1;}
+.ab-tag{font-family:'Space Mono',monospace;font-size:0.6rem;color:var(--purple);letter-spacing:0.25em;text-transform:uppercase;margin-bottom:0.75rem;display:block;}
+.ab-title{font-family:'Orbitron',sans-serif;font-size:1.2rem;font-weight:700;margin-bottom:1.25rem;line-height:1.3;}
+.ab-body{font-size:0.85rem;color:var(--muted);line-height:1.9;}
+.ab-body strong{color:var(--text);font-weight:600;}
+.ab-body .hl{color:var(--cyan);font-family:'Space Mono',monospace;font-size:0.8rem;}
+.vs-chart{margin-top:1.5rem;display:flex;flex-direction:column;gap:0.75rem;}
+.vs-row{display:flex;align-items:center;gap:1rem;}
+.vs-label{font-size:0.75rem;min-width:120px;color:var(--text);white-space:nowrap;}
+.vs-bars{flex:1;display:flex;height:24px;border-radius:2px;overflow:hidden;}
+.vs-bar-ai{background:linear-gradient(90deg,var(--purple),rgba(124,58,237,0.5));display:flex;align-items:center;justify-content:center;font-size:0.6rem;font-family:'Space Mono',monospace;color:white;transition:width 1s ease;}
+.vs-bar-hw{background:linear-gradient(90deg,rgba(0,245,255,0.3),rgba(0,245,255,0.5));display:flex;align-items:center;justify-content:center;font-size:0.6rem;font-family:'Space Mono',monospace;color:white;transition:width 1s ease;}
+.barriers-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);margin-top:1.5rem;}
+.barrier-block{background:var(--bg);padding:1.5rem;}
+.bb-icon{font-size:1.5rem;margin-bottom:0.5rem;}
+.bb-title{font-size:0.85rem;font-weight:700;margin-bottom:0.5rem;color:var(--text);}
+.bb-body{font-size:0.75rem;color:var(--muted);line-height:1.7;}
+.bb-score{margin-top:0.75rem;font-family:'Space Mono',monospace;font-size:0.65rem;color:var(--amber);}
+.chart-wrap{position:relative;background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:1.5rem;margin-top:1.5rem;}
+.chart-title{font-family:'Space Mono',monospace;font-size:0.65rem;color:var(--muted);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:1rem;}
+.insight-row{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);margin-bottom:2px;}
+.insight-card{background:var(--bg2);padding:1.75rem;}
+.ic-num{font-family:'Orbitron',monospace;font-size:2.5rem;font-weight:900;background:linear-gradient(135deg,var(--cyan),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;}
+.ic-unit{font-size:0.7rem;color:var(--muted);margin:0.4rem 0;}
+.ic-desc{font-size:0.8rem;color:var(--muted);line-height:1.7;}
+
+/* SURVIVAL TABLE */
+.survival-table{width:100%;border-collapse:collapse;margin-top:1.5rem;}
+.survival-table th{font-family:'Space Mono',monospace;font-size:0.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.15em;padding:0.75rem 1rem;text-align:left;border-bottom:1px solid var(--border);}
+.survival-table td{padding:0.875rem 1rem;border-bottom:1px solid rgba(255,255,255,0.04);font-size:0.82rem;}
+.survival-table tr:hover td{background:rgba(0,245,255,0.03);}
+.prob-bar{display:flex;align-items:center;gap:0.75rem;}
+.prob-track{flex:1;height:4px;background:rgba(255,255,255,0.08);border-radius:100px;}
+.prob-fill{height:100%;border-radius:100px;}
+.prob-num{font-family:'Space Mono',monospace;font-size:0.7rem;min-width:30px;text-align:right;}
+
+/* TIMELINE */
+.timeline{position:relative;padding-left:2rem;}
+.timeline::before{content:'';position:absolute;left:0;top:0;bottom:0;width:1px;background:linear-gradient(180deg,var(--cyan),var(--purple),transparent);}
+.tl-item{position:relative;margin-bottom:2.5rem;padding-left:1.5rem;}
+.tl-dot{position:absolute;left:-2.4rem;top:0.2rem;width:10px;height:10px;border-radius:50%;border:2px solid var(--cyan);background:var(--bg);box-shadow:var(--glow-cyan);}
+.tl-phase{font-family:'Space Mono',monospace;font-size:0.6rem;color:var(--cyan);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:0.4rem;}
+.tl-title{font-size:1rem;font-weight:700;margin-bottom:0.5rem;}
+.tl-body{font-size:0.82rem;color:var(--muted);line-height:1.8;}
+.tl-products{margin-top:0.75rem;display:flex;flex-wrap:wrap;gap:0.4rem;}
+.tl-tag{font-size:0.65rem;padding:0.2rem 0.6rem;border:1px solid var(--border);border-radius:100px;color:var(--cyan);background:rgba(0,245,255,0.05);}
+
+/* QUADRANT */
+#quadrant-wrap{position:relative;height:500px;background:var(--bg2);border:1px solid var(--border);border-radius:4px;overflow:hidden;}
+.q-axis-x{position:absolute;left:0;right:0;top:50%;height:1px;background:rgba(255,255,255,0.1);}
+.q-axis-y{position:absolute;top:0;bottom:0;left:50%;width:1px;background:rgba(255,255,255,0.1);}
+.q-label{position:absolute;font-family:'Space Mono',monospace;font-size:0.6rem;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;}
+.q-dot{position:absolute;width:10px;height:10px;border-radius:50%;transform:translate(-50%,-50%);cursor:pointer;transition:all 0.2s;}
+.q-dot:hover{transform:translate(-50%,-50%) scale(2);z-index:10;}
+.q-dot-label{position:absolute;font-size:0.6rem;white-space:nowrap;top:12px;left:50%;transform:translateX(-50%);color:var(--text);background:rgba(10,15,30,0.9);padding:0.15rem 0.4rem;border-radius:3px;opacity:0;transition:opacity 0.2s;pointer-events:none;}
+.q-dot:hover .q-dot-label{opacity:1;}
+
+/* WECHAT */
+.wechat-concepts{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);}
+.wc-concept{background:var(--bg2);padding:2rem;position:relative;overflow:hidden;transition:background 0.3s;}
+.wc-concept:hover{background:var(--bg3);}
+.wc-concept::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--pink),var(--purple));opacity:0;transition:opacity 0.3s;}
+.wc-concept:hover::after{opacity:1;}
+.wc-num{font-family:'Orbitron',sans-serif;font-size:4rem;font-weight:900;color:rgba(255,255,255,0.04);position:absolute;top:1rem;right:1.5rem;line-height:1;}
+.wc-icon{font-size:2rem;margin-bottom:1rem;}
+.wc-name{font-size:1rem;font-weight:700;margin-bottom:0.5rem;color:var(--pink);}
+.wc-sub{font-size:0.75rem;color:var(--muted);line-height:1.7;}
+.wc-features{margin-top:1rem;list-style:none;}
+.wc-features li{font-size:0.72rem;color:var(--muted);padding:0.3rem 0;border-bottom:1px solid rgba(255,255,255,0.04);display:flex;align-items:center;gap:0.5rem;}
+.wc-features li::before{content:'›';color:var(--pink);font-weight:700;}
+
+/* FOOTER */
+#footer{background:var(--bg2);border-top:1px solid var(--border);padding:4rem 2rem;text-align:center;}
+.footer-logo{font-family:'Orbitron',sans-serif;font-size:1rem;color:var(--cyan);margin-bottom:1rem;}
+.footer-text{font-size:0.75rem;color:var(--muted);line-height:1.8;max-width:500px;margin:0 auto;}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .analysis-container{grid-template-columns:1fr;}
+  .barriers-grid{grid-template-columns:1fr;}
+  .wechat-concepts{grid-template-columns:1fr;}
+  .insight-row{grid-template-columns:1fr;}
+  .modal-grid{grid-template-columns:1fr;}
+  .hero-stats{gap:1.5rem;}
+  .nav-links{display:none;}
+  .products-grid{grid-template-columns:1fr 1fr;}
+  .spotlight-grid{grid-template-columns:1fr 1fr;}
+}
+@media(max-width:480px){
+  .products-grid{grid-template-columns:1fr;}
+  .spotlight-grid{grid-template-columns:1fr;}
+}
+.fade-up{opacity:0;transform:translateY(30px);transition:opacity 0.6s ease,transform 0.6s ease;}
+.fade-up.visible{opacity:1;transform:translateY(0);}
+</style>
+</head>
+<body>
+
+<nav id="nav">
+  <div class="nav-logo">AI × HW REPORT</div>
+  <ul class="nav-links">
+    <li><a href="#spotlight">重点关注</a></li>
+    <li><a href="#products">50产品</a></li>
+    <li><a href="#analysis">深度分析</a></li>
+    <li><a href="#survival">存活预测</a></li>
+    <li><a href="#evolution">演进路径</a></li>
+    <li><a href="#quadrant">战略地图</a></li>
+    <li><a href="#wechat" id="nav-wechat">微信畅想</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<div id="hero">
+  <canvas id="hero-canvas"></canvas>
+  <div class="hero-content">
+    <div class="hero-tag">▸ 2024–2025 AI硬件众筹深度研究报告</div>
+    <h1 class="hero-title">当AI遇见<br>真实世界</h1>
+    <p class="hero-sub">50个众筹项目，解码AI硬件时代最真实的市场信号、技术演进与商业逻辑</p>
+    <div class="hero-stats">
+      <div class="stat"><div class="stat-num" data-count="50">0</div><div class="stat-label">产品扫描</div></div>
+      <div class="stat"><div class="stat-num" data-count="3600" data-suffix="万+">0</div><div class="stat-label">美元融资</div></div>
+      <div class="stat"><div class="stat-num" data-count="8">0</div><div class="stat-label">核心品类</div></div>
+      <div class="stat"><div class="stat-num" data-count="2" data-suffix="-3年">0</div><div class="stat-label">关键生死线</div></div>
+    </div>
+    <div class="hero-scroll"><span>↓</span><span>开始探索</span></div>
+  </div>
+</div>
+
+<div class="full-divider"></div>
+
+<!-- SPOTLIGHT: TOP 5 -->
+<div id="spotlight">
+  <div class="spotlight-header">
+    <div class="spotlight-title">⭐ 重点关注</div>
+    <div class="spotlight-sub">编辑精选 · 5个核心研究对象</div>
+  </div>
+  <div class="spotlight-grid" id="spotlight-grid"></div>
+</div>
+
+<div class="full-divider"></div>
+
+<!-- SECTION 1: 50 PRODUCTS -->
+<section id="products">
+  <div class="section-header fade-up">
+    <span class="section-tag">§ 01 / 产品深度介绍</span>
+    <h2 class="section-title">50个产品<br>50种未来的切片</h2>
+    <p class="section-desc">每一个产品背后都是一个关于AI与物理世界碰撞的实验。点击任意产品深入了解。</p>
+    <div class="filter-row" style="margin-top:2rem">
+      <button class="filter-btn active" data-filter="all">全部 50</button>
+      <button class="filter-btn" data-filter="robot">🤖 机器人</button>
+      <button class="filter-btn" data-filter="health">💊 健康穿戴</button>
+      <button class="filter-btn" data-filter="compute">🖥 AI算力</button>
+      <button class="filter-btn" data-filter="home">🏠 智能家居</button>
+      <button class="filter-btn" data-filter="sport">🚴 运动出行</button>
+      <button class="filter-btn" data-filter="edu">🎓 教育开发</button>
+      <button class="filter-btn" data-filter="xr">🥽 XR显示</button>
+    </div>
+  </div>
+  <div class="products-grid" id="products-grid"></div>
+</section>
+
+<div class="full-divider"></div>
+
+<!-- SECTION 2: ANALYSIS -->
+<section id="analysis">
+  <div class="section-header fade-up">
+    <span class="section-tag">§ 02 / 成功案例深度分析</span>
+    <h2 class="section-title">解剖25个成功案例<br>背后的驱动力</h2>
+    <p class="section-desc">AI是装饰品还是核心引擎？四大壁垒如何决定生死？</p>
+  </div>
+  <div class="insight-row fade-up">
+    <div class="insight-card"><div class="ic-num">72%</div><div class="ic-unit">AI深度整合占比</div><div class="ic-desc">超过7成成功项目中，AI不是贴牌功能，而是构成产品核心价值主张的关键算法层</div></div>
+    <div class="insight-card"><div class="ic-num">$1M</div><div class="ic-unit">平均头部项目融资门槛</div><div class="ic-desc">成功的25个项目中，融资超过$1M的有8个，形成明显的"头部效应"</div></div>
+    <div class="insight-card"><div class="ic-num">6个</div><div class="ic-unit">中国团队主导项目</div><div class="ic-desc">深圳、香港、上海团队在AI硬件众筹中展现出极强的产品化执行力与供应链优势</div></div>
+  </div>
+  <div class="analysis-container fade-up" style="margin-top:2px">
+    <div class="analysis-block">
+      <span class="ab-tag">核心命题分析</span>
+      <h3 class="ab-title">AI vs 硬件<br>谁在驱动谁？</h3>
+      <div class="ab-body">
+        <p>分析25个成功案例，我们发现了三种截然不同的AI-硬件关系模型：</p><br>
+        <p><strong>「AI即产品」型</strong> — 以LivingAI EMO、Mirumi为代表。硬件是容器，AI人格才是消费者真正购买的东西。<br><br>
+        <strong>「AI赋能硬件」型</strong> — 以Unitree Go2、Petoi Bittle X为代表。AI使其从玩具变成真正智能体。<br><br>
+        <strong>「AI贴标签」型</strong> — 部分健康穿戴产品，AI其实只是一个写在PPT上的词。<span class="hl">这是死亡风险最高的模式。</span></p>
+      </div>
+      <div class="vs-chart" id="vs-chart"></div>
+    </div>
+    <div class="analysis-block">
+      <span class="ab-tag">数据可视化</span>
+      <h3 class="ab-title">各品类AI深度<br>vs 融资规模</h3>
+      <div class="chart-wrap">
+        <div class="chart-title">AI技术深度 × 融资金额（气泡大小=项目数）</div>
+        <div style="position:relative;height:260px"><canvas id="scatter-chart"></canvas></div>
+      </div>
+    </div>
+  </div>
+  <div class="analysis-container fade-up" style="margin-top:2px">
+    <div class="analysis-block full">
+      <span class="ab-tag">壁垒体系</span>
+      <h3 class="ab-title">四大壁垒：决定AI硬件生死的护城河</h3>
+      <div class="ab-body"><p>不是所有的"AI功能"都能转化为商业壁垒。我们用四个维度评估25个成功项目，识别出真正可持续的竞争力来源。</p></div>
+      <div class="barriers-grid">
+        <div class="barrier-block"><div class="bb-icon">🏦</div><div class="bb-title">商业壁垒</div><div class="bb-body">订阅+硬件的双轨收入是最强模式。CUDIS Ring用"健康赚币"创造了用户自传播飞轮；Circular Ring Slim的"无订阅费"反其道而行，在竞争者普遍收费时成为差异点。<br><br><strong>关键洞察：</strong>AI硬件的商业模式往往比硬件本身更难复制。数据网络效应一旦形成，后来者几乎无法追赶。</div><div class="bb-score">风险评分：★★★★☆ — 高壁垒，慢建立</div></div>
+        <div class="barrier-block"><div class="bb-icon">⚙️</div><div class="bb-title">技术壁垒</div><div class="bb-body">50个项目中，真正拥有核心技术专利或自研算法的不超过30%。Unitree的步态算法、Petoi的开源OpenCat社区、Olares的个人云OS——这些才是无法用"买模块"复制的能力。<br><br><strong>危险信号：</strong>大量项目依赖OpenAI API + 通用MCU，技术壁垒接近零，护城河是品牌和先发。</div><div class="bb-score">风险评分：★★★☆☆ — 分化严重</div></div>
+        <div class="barrier-block"><div class="bb-icon">📣</div><div class="bb-title">获客壁垒</div><div class="bb-body">Kickstarter本质上是一个昂贵的广告平台，首发即见顶。真正的获客壁垒来自：<br>① 用户生成内容（EMO的TikTok生态）<br>② 垂直社群（Petoi的机器人教育圈）<br>③ 平台内生流量（产品自带社交属性）<br><br>融资结束后，如何维持增长是绝大多数项目面临的第一道死亡关卡。</div><div class="bb-score">风险评分：★★★★★ — 最高风险点</div></div>
+        <div class="barrier-block"><div class="bb-icon">🧠</div><div class="bb-title">用户壁垒</div><div class="bb-body">AI硬件的真正护城河是用户数据和习惯迁移成本。RingConn积累了数百万条睡眠数据后，用户不会因为新品牌便宜$50就切换——历史数据的连续性创造了真实的锁定效应。<br><br>反例：没有个人化数据的AI硬件（如AI香薰机）极易被替代，用户粘性几乎为零。</div><div class="bb-score">风险评分：★★★☆☆ — 积累后成护城河</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="full-divider"></div>
+
+<!-- SECTION 3: SURVIVAL -->
+<section id="survival">
+  <div class="section-header fade-up">
+    <span class="section-tag">§ 03 / 存活预测 + 迭代建议</span>
+    <h2 class="section-title">2-3年后<br>谁还活着？</h2>
+    <p class="section-desc">基于壁垒分析、市场规模、团队背景和迭代能力，对25个成功案例做出存活概率评估。</p>
+  </div>
+  <div class="analysis-container fade-up">
+    <div class="analysis-block full">
+      <table class="survival-table" id="survival-table"></table>
+    </div>
+  </div>
+  <div class="analysis-container fade-up" style="margin-top:2px">
+    <div class="analysis-block">
+      <span class="ab-tag">中国市场本土化</span>
+      <h3 class="ab-title">进入中国市场<br>的生死方程式</h3>
+      <div class="ab-body">
+        <p><strong>▸ OpenAI依赖是致命伤。</strong> 在中国无法调用ChatGPT的产品必须完整迁移到国内大模型（通义、文心、混元）。<br><br>
+        <strong>▸ 微信生态是护城河，也是锁链。</strong> 与微信深度整合可以极大降低获客成本，但意味着把产品命脉交给腾讯。建议双轨策略：微信小程序引流，独立App留存。<br><br>
+        <strong>▸ 定价必须重构。</strong> RingConn Gen 2在Kickstarter定价$100+，国内同类竞品可能出现在$50以内。溢价逻辑必须重新叙事。<br><br>
+        <strong>▸ 供应链已在中国。</strong> 绝大多数项目的硬件本就在珠三角生产，本土化的真正成本是软件本地化和合规。</p>
+      </div>
+    </div>
+    <div class="analysis-block">
+      <span class="ab-tag">迭代建议</span>
+      <h3 class="ab-title">产品迭代的<br>三条关键路径</h3>
+      <div class="ab-body">
+        <p><strong>路径一：从工具到平台</strong><br>以Enabot EBO X为例——从家庭监控摄像头到AI家庭机器人平台，每一次固件更新都在扩大用例边界。<br><br>
+        <strong>路径二：从独立到生态</strong><br>Olares One的策略最具参考价值：开源OS + 硬件 + 应用市场。<br><br>
+        <strong>路径三：从硬件到服务</strong><br>几乎所有成功的可穿戴设备最终都要面对这个转型。Ring产品们的最终竞争力在于能否成为用户的个人健康数据大脑。<br><br>
+        <strong>警告：</strong>试图同时走三条路的团队，往往三条路都走不好。聚焦比全面更重要。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="full-divider"></div>
+
+<!-- SECTION 4: EVOLUTION -->
+<section id="evolution">
+  <div class="section-header fade-up">
+    <span class="section-tag">§ 04 / 活跃案例 × AI Agent演进</span>
+    <h2 class="section-title">从工具到代理<br>AI硬件的三次跃迁</h2>
+    <p class="section-desc">25个活跃众筹项目预示着AI硬件的下一个阶段——从被动响应到主动代理。</p>
+  </div>
+  <div class="analysis-container fade-up">
+    <div class="analysis-block">
+      <span class="ab-tag">演进时间线</span>
+      <h3 class="ab-title">AI硬件的<br>三次进化</h3>
+      <div class="timeline" style="margin-top:1.5rem">
+        <div class="tl-item">
+          <div class="tl-dot"></div>
+          <div class="tl-phase">Phase 1 · 2022-2023</div>
+          <div class="tl-title">AI作为功能标签</div>
+          <div class="tl-body">早期AI硬件把"AI"当成营销词汇。核心逻辑是：把现有产品加上语音识别或图像分类，贴上AI标签。用户体验提升有限，复购率极低。</div>
+          <div class="tl-products"><span class="tl-tag">Hitch AI Bottle</span><span class="tl-tag">AI Composter</span><span class="tl-tag">NovaSmart Ring</span></div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot" style="border-color:var(--purple);box-shadow:var(--glow-purple)"></div>
+          <div class="tl-phase">Phase 2 · 2023-2024</div>
+          <div class="tl-title">LLM驱动的个性化体验</div>
+          <div class="tl-body">ChatGPT API的开放让AI硬件实现了真正的自然语言交互。产品从"if-then规则"跳升到"理解意图"。这一阶段涌现出大量陪伴型机器人和个人健康AI。</div>
+          <div class="tl-products"><span class="tl-tag" style="color:var(--purple);border-color:rgba(124,58,237,0.4)">LivingAI EMO</span><span class="tl-tag" style="color:var(--purple);border-color:rgba(124,58,237,0.4)">Ropet AI Pet</span><span class="tl-tag" style="color:var(--purple);border-color:rgba(124,58,237,0.4)">CUDIS Ring</span></div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot" style="border-color:var(--pink);box-shadow:0 0 20px rgba(244,114,182,0.4)"></div>
+          <div class="tl-phase">Phase 3 · 2024-2025 · 进行中</div>
+          <div class="tl-title">Agentic硬件：主动行动</div>
+          <div class="tl-body">活跃案例已经开始探索下一个维度——AI不再等待指令，而是主动感知环境、决策并执行。这是从"助理"到"代理"的质变。<br><br>关键信号：VITA RING的主动健康干预、AI Plant Guardian的自主植物护理、HAX A4 Car Kit的车内自主交互。</div>
+          <div class="tl-products"><span class="tl-tag" style="color:var(--pink);border-color:rgba(244,114,182,0.4)">VITA RING</span><span class="tl-tag" style="color:var(--pink);border-color:rgba(244,114,182,0.4)">AI Plant Guardian</span><span class="tl-tag" style="color:var(--pink);border-color:rgba(244,114,182,0.4)">AI Posture Pro</span><span class="tl-tag" style="color:var(--pink);border-color:rgba(244,114,182,0.4)">Mirumi</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="analysis-block">
+      <span class="ab-tag">活跃案例关键洞察</span>
+      <h3 class="ab-title">25个进行中项目<br>的三个共同信号</h3>
+      <div class="ab-body" style="margin-top:1rem">
+        <p><strong>信号一：场景垂直化加速</strong><br>成功案例大多是通用AI助手，活跃案例几乎全部是极度垂直的场景——水族箱监测、骑行助手、咖啡冲煮——这是市场教育完成后的必然分化。<br><br>
+        <strong>信号二：隐私成为卖点</strong><br>AI Posture Pro强调"无摄像头"、VITA RING主打本地处理、AI Aquarium Monitor离线运行。隐私不再是限制条件，而是主动营销的核心差异点。<br><br>
+        <strong>信号三：二次元 × AI的新品类涌现</strong><br>CODE27 Livehouse是最具野心的产品——3D全息AI虚拟人交互终端。这预示着一个全新的市场：不是把AI注入传统产品，而是用AI创造此前根本不存在的产品类型。</p>
+      </div>
+      <div class="chart-wrap" style="margin-top:1.5rem">
+        <div class="chart-title">活跃项目品类分布 vs 成功案例对比</div>
+        <div style="position:relative;height:220px"><canvas id="compare-chart"></canvas></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="full-divider"></div>
+
+<!-- SECTION 5: QUADRANT -->
+<section id="quadrant">
+  <div class="section-header fade-up">
+    <span class="section-tag">§ 05 / 战略地图</span>
+    <h2 class="section-title">AI × 硬件<br>四象限定位图</h2>
+    <p class="section-desc">X轴：AI技术深度（低→高）｜Y轴：市场规模潜力（低→高）<br>气泡颜色代表品类，点击任意产品查看分析。</p>
+  </div>
+  <div id="quadrant-wrap" class="fade-up">
+    <div class="q-axis-x"></div><div class="q-axis-y"></div>
+    <div class="q-label" style="left:52%;top:10px">↑ 高市场潜力</div>
+    <div class="q-label" style="left:52%;bottom:10px">↓ 低市场潜力</div>
+    <div class="q-label" style="left:10px;top:50%;transform:translateY(-50%)">← 低AI深度</div>
+    <div class="q-label" style="right:10px;top:50%;transform:translateY(-50%)">高AI深度 →</div>
+    <div class="q-label" style="left:12%;top:12%;color:rgba(0,245,255,0.3);font-size:0.55rem">📦 规模先行</div>
+    <div class="q-label" style="right:8%;top:12%;color:rgba(124,58,237,0.5);font-size:0.55rem">🚀 明星区域</div>
+    <div class="q-label" style="left:12%;bottom:12%;color:rgba(255,255,255,0.2);font-size:0.55rem">⚠️ 红海厮杀</div>
+    <div class="q-label" style="right:8%;bottom:12%;color:rgba(251,191,36,0.4);font-size:0.55rem">🔬 技术探索</div>
+    <div id="quadrant-dots"></div>
+  </div>
+</section>
+
+<div class="full-divider"></div>
+
+<!-- SECTION 6: WECHAT (toggleable) -->
+<section id="wechat">
+  <div class="section-header fade-up">
+    <span class="section-tag">§ 06 / 微信硬件畅想</span>
+    <h2 class="section-title">如果微信做<br>AI社交硬件</h2>
+    <p class="section-desc">微信拥有13亿用户、最丰富的社交图谱和成熟的支付生态。在AI时代，这是独一无二的硬件底座。以下是6个天马行空的产品概念。</p>
+  </div>
+  <div class="wechat-concepts fade-up" id="wechat-grid"></div>
+  <div class="analysis-container fade-up" style="margin-top:2px">
+    <div class="analysis-block full">
+      <span class="ab-tag">战略分析</span>
+      <h3 class="ab-title">微信做AI硬件的<br>独特优势与核心挑战</h3>
+      <div class="analysis-container" style="margin-top:1.5rem;background:none;gap:2rem">
+        <div style="flex:1"><div class="ab-body"><p><strong>三大不可复制优势：</strong><br><br><span class="hl">① 社交图谱即传感器网络</span><br>微信知道你的所有关系和联系频率。AI硬件可以据此主动提醒："你已经3个月没联系父母了，要不要给他们发条语音？"这是Apple Watch无法做到的情感计算。<br><br><span class="hl">② 支付即激励引擎</span><br>CUDIS Ring的"健康赚币"概念，在微信生态里可以直接变成红包激励、好友PK、群组打卡，获客成本降低到接近零。<br><br><span class="hl">③ 小程序即AI应用商店</span><br>Olares One花了大量成本构建应用生态，而微信硬件天然内置一个有1000万小程序的AI应用商店。</p></div></div>
+        <div style="flex:1"><div class="ab-body"><p><strong>三大核心挑战：</strong><br><br><span class="hl" style="color:var(--red)">① 用户隐私的高压线</span><br>微信硬件获取物理空间数据（位置、声音、健康）会引发监控担忧。需要极度透明的数据使用规则和用户控制权设计。<br><br><span class="hl" style="color:var(--red)">② 硬件基因的缺失</span><br>腾讯不是硬件公司。成功路径可能是投资/收购策略（投Ropet、投EMO类公司）而非自研。<br><br><span class="hl" style="color:var(--red)">③ 拆散微信的风险</span><br>微信做硬件会让竞争对手（字节跳动、OPPO）加速硬件布局，可能改变整个移动互联网的平台格局。</p></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="full-divider"></div>
+
+<footer id="footer">
+  <div class="footer-logo">AI × HARDWARE INTELLIGENCE REPORT</div>
+  <p class="footer-text">本报告基于2024-2025年Kickstarter及Indiegogo平台50个AI硬件众筹项目的公开数据分析整理。<br>所有存活预测及战略分析均基于市场逻辑推断，不构成投资建议。</p>
+  <p style="margin-top:1rem;font-family:'Space Mono',monospace;font-size:0.6rem;color:var(--muted);letter-spacing:0.2em">GENERATED WITH DEEP ANALYSIS · 2025</p>
+</footer>
+
+<!-- MODAL -->
+<div id="modal-overlay">
+  <div id="modal">
+    <div class="modal-header">
+      <div><div class="modal-emoji" id="m-emoji"></div><div class="modal-title" id="m-title"></div><div class="modal-tag" id="m-tag"></div></div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="m-body"></div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+// ══════════════════════════════════════════════
+// LOAD CONFIG FROM ADMIN (localStorage)
+// ══════════════════════════════════════════════
+let adminData = null;
+let featuredIds = [15, 25, 3, 2, 28]; // default featured IDs
+let showWechat = true;                  // default show wechat
+
+try {
+  const saved = localStorage.getItem('ai-hw-admin');
+  if (saved) {
+    adminData = JSON.parse(saved);
+    // Sort by admin order
+    adminData.forEach(p => { if (!p.links) p.links = {}; });
+  }
+} catch(e) {}
+
+try {
+  const cfg = localStorage.getItem('ai-hw-config');
+  if (cfg) {
+    const parsed = JSON.parse(cfg);
+    if (parsed.featuredIds && parsed.featuredIds.length === 5) featuredIds = parsed.featuredIds;
+    if (typeof parsed.showWechat === 'boolean') showWechat = parsed.showWechat;
+  }
+} catch(e) {}
+
+// ══════════════════════════════════════════════
+// BASE DATA (fallback / merged with admin)
+// ══════════════════════════════════════════════
+const baseProducts = [
+  {id:1,name:"Olares One",emoji:"🖥",hook:"NVIDIA 5090M驱动的本地个人AI云，数据不出门",amount:"$2.3M+",status:"done",cat:"compute",star:5,desc:"一台桌面AI工作站，配备NVIDIA GeForce RTX 5090M显卡，运行Olares开源操作系统。用户可在本地运行大型语言模型、AI Agent，所有数据留存本地，不依赖任何云服务。",barriers:["技术：开源OS生态 + 专属硬件形成双重锁定","商业：硬件一次性收入，未来潜在订阅服务","获客：科技媒体自传播强，主流用户触达弱","用户：数据不出门创造高迁移成本"],survival:85,advice:"聚焦企业级隐私计算场景，与AI开发者工具链深度整合，建立应用开发者生态系统。",china:"",links:{}},
+  {id:2,name:"Rokid Glasses",emoji:"🥽",hook:"双眼Micro LED显示AI XR眼镜，开放生态",amount:"$4M+",status:"done",cat:"xr",star:5,desc:"49克全功能AI AR眼镜，搭载12MP摄像头、双眼Micro LED波导显示、实时89语言翻译。Kickstarter XR品类历史最高融资记录。",barriers:["技术：Micro LED波导专利保护","商业：硬件销售+开放SDK生态","获客：媒体曝光极强，Times Square快闪活动","用户：多语言翻译创造刚需用户"],survival:78,advice:"聚焦B端商务翻译和企业培训场景，这是消费级AR眼镜最快商业化的路径。",china:"",links:{}},
+  {id:3,name:"Ropet AI Pet",emoji:"🐾",hook:"模仿生物反馈的下一代AI电子宠物",amount:"HK$2.4M",status:"ship",cat:"robot",star:5,desc:"毛茸茸的桌面AI宠物，体温37.5°C，多模态感知用户情绪，自我进化个性。斯坦福博士联合创始，ByteDance、微软团队核心成员。",barriers:["技术：生物反馈算法 + 40+专利","商业：硬件销售，外观订制付费潜力大","获客：女性用户TikTok自发传播","用户：情感依附创造极高迁移成本"],survival:82,advice:"快速推出宠物个性订阅服务，让AI角色随时间成长进化。",china:"",links:{}},
+  {id:4,name:"Tachyon SBC",emoji:"📡",hook:"自带Snapdragon NPU的5G单板电脑",amount:"$500k+",status:"done",cat:"compute",star:3,desc:"Particle公司开发的5G单板电脑，搭载高通QCM6490芯片（12 TOPS AI算力），信用卡大小，支持Ubuntu 24.04，专为边缘AI推理设计。",barriers:["技术：高通芯片供应链关系","商业：硬件+Particle IoT平台订阅","获客：开发者社区口碑传播","用户：开发者工具链依赖"],survival:70,advice:"深化与工业IoT客户的合作，边缘AI在制造业和医疗设备领域的需求正在爆发。",china:"",links:{}},
+  {id:5,name:"RingConn Gen 2",emoji:"💍",hook:"全球最薄AI深度睡眠康复建议智能戒指",amount:"$1M+",status:"ship",cat:"health",star:4,desc:"业界最薄最轻智能戒指，AI驱动的睡眠健康分析，12天超长续航，无订阅费。专注于睡眠康复建议而非简单数据展示。",barriers:["技术：超薄传感器封装工艺","商业：硬件一次性购买，数据分析增值","获客：健康KOL口碑传播","用户：历史睡眠数据积累"],survival:75,advice:"开发睡眠改善处方功能，与医疗机构合作背书，进入医疗保险报销体系。",china:"",links:{}},
+  {id:6,name:"BUG Ethical Hacking",emoji:"🔓",hook:"AI语音控制黑客终端，降低渗透测试门槛",amount:"$300k+",status:"done",cat:"edu",star:2,desc:"USB形态的AI驱动渗透测试工具，支持Wi-Fi分析、BLE扫描、GPT辅助脚本生成，语音控制操作。",barriers:["技术：安全工具算法库","商业：硬件一次性，培训课程潜力","获客：安全社区口碑","用户：专业工具依赖"],survival:60,advice:"建立企业安全培训订阅服务，将工具扩展为网络安全学习平台。",china:"",links:{}},
+  {id:7,name:"iKKO Mind One",emoji:"📱",hook:"信用卡大小AI备用手机，自带免费全球流量",amount:"$200k+",status:"done",cat:"compute",star:3,desc:"全球最小4G Android手机，4.02英寸AMOLED屏，内置60+国家免费AI网络，180°翻转索尼摄像头，Hi-Fi DAC音频，物理QWERTY键盘。",barriers:["技术：全球流量协议资源","商业：硬件销售+流量套餐","获客：旅行和商务人群精准传播","用户：流量依赖粘性"],survival:55,advice:"聚焦商务人士的隐私副机场景，与企业VPN和安全解决方案捆绑销售。",china:"",links:{}},
+  {id:8,name:"Nexus GPU Expansion",emoji:"🖥",hook:"为NAS增加服务器级GPU扩展，实现家庭大模型",amount:"$400k+",status:"done",cat:"compute",star:4,desc:"将服务器级GPU集成到家庭NAS的扩展坞，AMD Ryzen 7主板，双10GbE，支持ZFS，完全开源平台。",barriers:["技术：开源平台生态","商业：硬件一次性购买","获客：自建AI服务器社区","用户：数据和配置迁移成本高"],survival:65,advice:"推出托管云服务选项，让不具备运维能力的用户也能享受本地AI算力。",china:"",links:{}},
+  {id:9,name:"ALPON X5",emoji:"🍓",hook:"树莓派生态下的边缘AI算力底座",amount:"$150k",status:"done",cat:"compute",star:2,desc:"Sixfab公司开发，基于树莓派的边缘AI计算平台，集成蜂窝网络连接，面向工业IoT和AI推理场景的开发者工具。",barriers:["技术：树莓派生态整合能力","商业：硬件+平台订阅","获客：Maker社区传播","用户：开发者生态依赖"],survival:58,advice:"聚焦农业IoT和智慧城市应用，与系统集成商建立分销伙伴关系。",china:"",links:{}},
+  {id:10,name:"LCMD MicroServer",emoji:"🗄",hook:"专为个人隐私定制的微型AI服务器",amount:"$120k",status:"done",cat:"compute",star:3,desc:"香港团队开发，Intel i5处理器，64GB DDR5内存，全SSD存储（最高96TB），内置2000+应用，专注个人隐私数据主权。",barriers:["技术：应用生态整合","商业：硬件一次性","获客：香港/台湾隐私意识用户","用户：数据迁移成本"],survival:52,advice:"开发企业版本，聚焦金融和医疗等合规敏感行业的私有化部署需求。",china:"",links:{}},
+  {id:11,name:"Doly Robotic",emoji:"🤖",hook:"基于树莓派的开源情绪桌面机器人",amount:"CA$300k",status:"done",cat:"robot",star:3,desc:"加拿大团队，开源AI桌面机器人，树莓派驱动，可表达情绪、进行语音交互，面向开发者和教育市场。",barriers:["技术：开源社区贡献","商业：硬件+教育课程","获客：Maker和教育社区","用户：开源生态依赖"],survival:62,advice:"与K-12教育机构合作，将机器人整合为编程和AI教育的实体教具。",china:"",links:{}},
+  {id:12,name:"CUDIS Ring",emoji:"⚡",hook:"健康赚币机制的AI戒指，激励运动",amount:"$1M",status:"ship",cat:"health",star:4,desc:"基于Solana区块链的AI健康戒指，用户通过健康行为赚取CUDIS代币，AI Coach提供个性化健康计划。已有50位奥运选手背书，超过25万用户。",barriers:["技术：AI健康算法+区块链激励","商业：硬件+代币经济+订阅","获客：Web3社区+运动员背书","用户：代币激励+健康数据积累"],survival:68,advice:"开发企业员工健康计划版本，与保险公司合作降低健康风险溢价。",china:"",links:{}},
+  {id:13,name:"ORIGINAL+ Skis",emoji:"⛷",hook:"AI根据用户滑雪习惯定制物理结构的滑雪板",amount:"$100k+",status:"done",cat:"sport",star:3,desc:"世界首创AI定制滑雪板，通过分析用户滑雪动作数据，定制滑雪板的物理弯曲弧度和硬度。",barriers:["技术：AI物理参数优化算法","商业：高端定制溢价","获客：专业滑雪圈口碑","用户：定制数据积累"],survival:45,advice:"开发滑雪培训订阅服务，用传感器数据持续优化设备配置建议。",china:"",links:{}},
+  {id:14,name:"Hitch AI Bottle",emoji:"💧",hook:"根据AI活动量建议补水量的智能水壶",amount:"$80k",status:"done",cat:"home",star:1,desc:"AI驱动的智能补水提醒水壶，根据用户当日运动量、天气和个人数据计算个性化补水目标。",barriers:["技术：算法简单，壁垒极低","商业：硬件一次性，竞争激烈","获客：健康生活媒体曝光","用户：几乎无迁移成本"],survival:30,advice:"转型为健身生态系统配件，与健康手环深度整合，找到分销伙伴而非独立存活。",china:"",links:{}},
+  {id:15,name:"Unitree Go2",emoji:"🐕",hook:"NPU加速步态算法的消费级四足机器人",amount:"$1M+",status:"done",cat:"robot",star:5,desc:"宇树科技消费级四足机器人，4D超宽LiDAR，LLM语音控制，2.5m/s+速度，支持Python编程和ROS2，全球机器狗销量领先。",barriers:["技术：步态算法+自研关节电机","商业：硬件销售+教育版授权","获客：机器人媒体+B站爆款","用户：开发者生态深度绑定"],survival:90,advice:"加速教育版和企业安防巡检版本，这是市场规模最大的两个垂直场景。",china:"",links:{}},
+  {id:16,name:"Petoi Bittle X",emoji:"🦮",hook:"OpenAI接口驱动的教育类AI机器狗",amount:"$200k",status:"done",cat:"edu",star:4,desc:"掌心大小的AI机器狗，支持语音控制、姿态识别、Python/C++/Scratch编程，基于开源OpenCat平台，被全球顶尖大学用于机器人研究。",barriers:["技术：OpenCat开源生态，GitHub最多star","商业：教育市场+开发者社区","获客：大学研究院+STEM教育渠道","用户：开源代码依赖+社区粘性"],survival:80,advice:"与K-12和大学建立长期课程授权合作，打造AI机器人STEM认证体系。",china:"",links:{}},
+  {id:17,name:"Zeroth Bot",emoji:"🦾",hook:"支持Python编程的人形AI开发底座",amount:"$150k",status:"done",cat:"edu",star:3,desc:"开源可编程人形机器人，支持语音命令、手势感应和Python编程，面向学生、研究人员和创客。",barriers:["技术：开源平台，社区贡献","商业：教育市场","获客：大学和创客社区","用户：代码和配置依赖"],survival:55,advice:"聚焦具身AI研究领域，与大学研究经费合作而非直接面向消费者。",china:"",links:{}},
+  {id:18,name:"NovaSmart Ring",emoji:"💫",hook:"嵌入ChatGPT-4o的时尚类交互戒指",amount:"$110k",status:"done",cat:"health",star:2,desc:"将ChatGPT-4o整合入钛合金智能戒指，支持手势控制、20+生物指标监测、7天续航，定位时尚健康穿戴。",barriers:["技术：整合AI API，自身壁垒较低","商业：硬件一次性","获客：时尚科技媒体","用户：历史健康数据"],survival:40,advice:"与珠宝或奢侈品牌联名合作，将技术功能包装成时尚声明，聚焦高端女性市场。",china:"",links:{}},
+  {id:19,name:"Zettlab AI NAS",emoji:"📁",hook:"AI自动整理家庭照片与文档的智能存储",amount:"$250k",status:"done",cat:"compute",star:3,desc:"基于Intel Core Ultra 5，支持本地LLM，AI自动分类照片、文档和视频，双10GbE网口，最高200TB存储，面向家庭数字资产管理。",barriers:["技术：本地AI处理差异化","商业：硬件一次性","获客：家庭存储社区","用户：历史数据和索引不可迁移"],survival:60,advice:"开发相册AI搜索的杀手级应用，让非技术用户也能轻松找回10年前的家庭照片。",china:"",links:{}},
+  {id:20,name:"OUROBOT",emoji:"💬",hook:"桌面治愈系聊天机器人，主打心理疏导",amount:"$90k",status:"done",cat:"robot",star:3,desc:"AI情感陪伴桌面机器人，整合ChatGPT，专注心理健康支持和情感疏导，具有情绪感知能力和愈合个性，面向孤独感和心理健康需求人群。",barriers:["技术：情感AI算法","商业：硬件+订阅潜力","获客：心理健康社区","用户：情感依赖"],survival:58,advice:"与心理咨询平台合作，将机器人定位为专业心理支持的补充，而非替代品。",china:"",links:{}},
+  {id:21,name:"StackChan",emoji:"🤖",hook:"M5Stack生态开源AI交互小车",amount:"$130k",status:"done",cat:"edu",star:2,desc:"M5Stack官方开源AI桌面机器人，可爱动画脸部，AI语音助手，智能家居控制，完全开源硬件和软件，面向Maker和日本可爱文化爱好者。",barriers:["技术：M5Stack生态整合","商业：硬件销售","获客：日本Maker社区","用户：开源生态依赖"],survival:65,advice:"深化智能家居控制场景，成为Matter生态系统的可爱AI控制节点。",china:"",links:{}},
+  {id:22,name:"Enabot EBO X",emoji:"👁",hook:"AI守护家庭老人的非摄像头移动底座",amount:"$800k+",status:"done",cat:"robot",star:4,desc:"CES 2023创新奖，具备ChatGPT、V-SLAM自主导航、4K防抖摄像头、Harman音响的家庭守护机器人。可检测老人跌倒、药物提醒、远程家庭通话。",barriers:["技术：V-SLAM + 人体姿态识别","商业：高价硬件，订阅潜力","获客：家庭关爱媒体曝光","用户：家庭安全依赖"],survival:72,advice:"聚焦老龄化社会需求，与保险公司合作提供家庭安全套餐，打入日本和北欧市场。",china:"",links:{}},
+  {id:23,name:"Circular Ring Slim",emoji:"⭕",hook:"业内最轻AI健康反馈穿戴设备",amount:"$500k+",status:"done",cat:"health",star:4,desc:"法国健康科技品牌，全球最薄最轻智能戒指（2.2mm/2克），AI健康助手Kira+，142项生物指标，无订阅费策略差异化，首创触觉导航。",barriers:["技术：超薄传感器封装工艺","商业：无订阅差异化 + Circular Coin激励","获客：欧洲健康媒体","用户：7项关键健康数据积累"],survival:70,advice:"开发医疗级应用，通过CE认证进入欧洲数字医疗报销体系。",china:"",links:{}},
+  {id:24,name:"AI Composter",emoji:"🌱",hook:"AI优化垃圾降解效率并分析土壤肥力",amount:"$300k",status:"done",cat:"home",star:2,desc:"THRiVE智能厨余堆肥机，2.5小时极速处理，AI精确管控温湿度，异物检测，完全无味密封，众筹15分钟达标。",barriers:["技术：AI温控优化，壁垒有限","商业：硬件一次性","获客：可持续生活媒体","用户：使用习惯"],survival:48,advice:"与物业和酒店连锁合作，推出商业版本，比消费级更大的利润空间。",china:"",links:{}},
+  {id:25,name:"LivingAI EMO",emoji:"😎",hook:"2025年现象级桌面AI陪伴机器人",amount:"$2M+",status:"done",cat:"robot",star:5,desc:"全球最成功的AI陪伴机器人，1000+表情和动作，面部识别（记忆10人），自主探索桌面，与EMO互联网联动，自动归位充电，全球热销。",barriers:["技术：情感AI + 自主行为算法","商业：硬件+内容更新","获客：TikTok病毒传播","用户：情感依赖，极高迁移成本"],survival:88,advice:"推出EMO家族（多机联动）和企业版（前台接待）扩展产品线，建立IP授权收入。",china:"",links:{}},
+  {id:26,name:"Vinabot Talking Frame",emoji:"🖼",hook:"让旧照片开口说话的AI相框",amount:"—",status:"active",cat:"home",star:4,desc:"AI驱动的数字相框，让历史照片能够讲述故事，通过声音克隆技术重现逝去亲人的声音，支持40+语言。",barriers:["技术：声音克隆+照片理解AI","商业：订阅内容服务","获客：情感营销极强","用户：家庭记忆，无可替代"],survival:75,advice:"开发数字遗产功能，允许用户为后代留下AI化的自我记忆。",china:"",links:{}},
+  {id:27,name:"Mirumi Companion",emoji:"🐾",hook:"CES 2025爆款，$118的纯情绪交互毛绒AI",amount:"—",status:"active",cat:"robot",star:4,desc:"Yukai Engineering出品，CES 2025展会现象级产品。极简设计，无语言输出，通过身体语言表达情绪。",barriers:["技术：情绪表达算法","商业：低价高量","获客：CES媒体爆炸式传播","用户：情感依赖"],survival:72,advice:"与床上用品和婴儿产品品牌联名，进入礼品市场。",china:"",links:{}},
+  {id:28,name:"VITA RING",emoji:"⚡",hook:"主动式AI健康干预，非被动监测",amount:"—",status:"active",cat:"health",star:5,desc:"区别于所有智能戒指的被动监测，VITA RING主动干预：睡眠呼吸异常时震动提醒，心率异常时SOS警报，17+生物指标，7天续航。",barriers:["技术：主动干预算法","商业：医疗级差异化","获客：健康意识人群","用户：紧急救援依赖极高"],survival:78,advice:"申请医疗器械认证，与心脏科医院合作，进入可报销医疗设备市场。",china:"",links:{}},
+  {id:29,name:"Giada AI PC",emoji:"🖥",hook:"NUC规格边缘AI工作站，内置专用处理器",amount:"—",status:"active",cat:"compute",star:2,desc:"Giada Tech开发，Intel Ultra CPU + 集成AI GPU + NPU，Wi-Fi 7，紧凑NUC外形，专为边缘AI推理工作负载设计。",barriers:["技术：专用AI加速器整合","商业：企业边缘计算","获客：B端直销","用户：企业IT依赖"],survival:58,advice:"聚焦工厂边缘计算和零售AI分析场景，通过系统集成商渠道销售。",china:"",links:{}},
+  {id:30,name:"CODE27 Livehouse",emoji:"🌟",hook:"3D全息AI虚拟人交互终端，主打二次元",amount:"—",status:"active",cat:"robot",star:5,desc:"SyBran Innovation开发的3D AI虚拟伴侣终端，用户可自定义角色外观和性格，多模态AI交互，IoT控制中枢，主打二次元和虚拟偶像文化。",barriers:["技术：3D全息显示+角色AI","商业：角色订阅+内容付费","获客：二次元圈子极强传播","用户：情感依赖+角色数据"],survival:70,advice:"开发虚拟偶像IP授权业务，与二次元内容平台合作，在中国市场潜力巨大。",china:"",links:{}},
+  {id:31,name:"EVO-IN-MOTION Kit",emoji:"🎓",hook:"专为神经网络微调设计的硬件教学套件",amount:"—",status:"active",cat:"edu",star:2,desc:"加拿大团队开发，专注于神经网络在计算机视觉领域的微调实战教学，包含完整硬件和项目化课程。",barriers:["技术：课程内容壁垒","商业：课程订阅","获客：工程师培训市场","用户：认证体系依赖"],survival:55,advice:"开发企业AI培训版本，与在线教育平台合作进行课程分发。",china:"",links:{}},
+  {id:32,name:"Solar AI Shades",emoji:"🪟",hook:"AI学习阳光轨迹自动优化室内热效率的窗帘",amount:"—",status:"active",cat:"home",star:3,desc:"Mado Dynamic开发，太阳能驱动电动窗帘，AI分析阳光轨迹和天气数据，自动调节遮光率以节省空调能耗，Matter智能家居兼容，无需打孔安装。",barriers:["技术：AI能耗优化算法","商业：硬件+能源节省服务","获客：可持续家居媒体","用户：使用习惯养成"],survival:68,advice:"与房地产开发商和物业管理公司合作大规模采购，进入绿色建筑认证体系。",china:"",links:{}},
+  {id:33,name:"AI Plant Guardian",emoji:"🌿",hook:"翻译植物生理需求的LLM传感器",amount:"—",status:"active",cat:"home",star:3,desc:"将植物土壤、光线、温湿度传感器数据喂给LLM，让植物能够用自然语言表达需求，AI主动发送护理建议。",barriers:["技术：传感器+LLM整合","商业：硬件+订阅","获客：植物爱好者社区","用户：习惯养成"],survival:55,advice:"与园艺电商平台合作，将设备作为高端植物购买的免费赠品，大幅降低获客成本。",china:"",links:{}},
+  {id:34,name:"HAX A4 Car Kit",emoji:"🚗",hook:"为老旧车辆提供本地AI语音控制的改装模块",amount:"—",status:"active",cat:"sport",star:3,desc:"HAX加速器项目，为无CarPlay/Android Auto的旧车提供AI车机改装套件，本地语音控制音乐、导航和通讯，安装只需几秒钟。",barriers:["技术：离线AI语音识别","商业：保险和汽车后市场","获客：汽车改装社区","用户：使用习惯"],survival:62,advice:"与保险公司合作，将安全驾驶数据接入保险折扣计划，创造额外价值。",china:"",links:{}},
+  {id:35,name:"Smart AI Bike Comp",emoji:"🚴",hook:"AI实时分析骑行体能并给出补给建议",amount:"—",status:"active",cat:"sport",star:3,desc:"CYCLEASY AI骑行电脑，6合1功能，3.5英寸IPS显示屏，AI体能分析，GPS导航，实时补给和训练建议。",barriers:["技术：体能分析AI算法","商业：硬件一次性","获客：铁人三项和骑行社区","用户：训练数据积累"],survival:60,advice:"开发教练订阅服务，连接专业骑行教练和AI数据分析，打造高端训练平台。",china:"",links:{}},
+  {id:36,name:"Next-Step AI Kit",emoji:"👁",hook:"针对机器视觉开发的实战硬件包",amount:"—",status:"active",cat:"edu",star:2,desc:"机器视觉AI开发套件，包含摄像头、边缘AI芯片和完整教程，专注于实际项目训练而非理论学习。",barriers:["技术：配套教程内容","商业：硬件+课程","获客：工程师社区","用户：项目依赖"],survival:52,advice:"与职业培训机构合作，推出政府补贴的AI技能认证项目。",china:"",links:{}},
+  {id:37,name:"AI Grill Master",emoji:"🔥",hook:"自动预测肉质熟度并调整火力的AI烧烤硬件",amount:"—",status:"active",cat:"home",star:2,desc:"Indiegogo项目，AI烧烤温控系统，通过多传感器实时监测肉类内部温度和表面状态，AI预测最佳出锅时机并自动调节火力。",barriers:["技术：食材熟度AI模型","商业：硬件+食谱订阅","获客：烧烤爱好者社区","用户：食谱和偏好数据"],survival:55,advice:"与高端BBQ品牌联名，将AI控制系统作为顶级烧烤设备的标配功能。",china:"",links:{}},
+  {id:38,name:"AI Posture Pro",emoji:"🪑",hook:"AI深度传感器矫正坐姿，无摄像头保护隐私",amount:"—",status:"active",cat:"health",star:4,desc:"使用深度传感器（非摄像头）实时分析用户坐姿，AI给出即时矫正建议，完全保护隐私。面向长时间久坐的办公室用户。",barriers:["技术：深度传感器姿态识别","商业：硬件+订阅","获客：远程办公和健康办公媒体","用户：健康数据和习惯"],survival:65,advice:"与企业员工福利计划合作，进入B端集采市场，同时申请雇主健康保险报销。",china:"",links:{}},
+  {id:39,name:"AI Scent Diffuser",emoji:"🌸",hook:"根据AI检测到的情绪压力自动调配气味",amount:"—",status:"active",cat:"home",star:2,desc:"AI情绪感知香薰扩散器，通过分析用户行为数据和环境传感器判断情绪状态，自动调配对应的精油配方。",barriers:["技术：情绪推断算法","商业：硬件+精油订阅","获客：wellness媒体","用户：精油订阅粘性"],survival:52,advice:"与冥想和正念App（Calm等）合作，成为其生态系统的智能硬件配件。",china:"",links:{}},
+  {id:40,name:"AI Aquarium Monitor",emoji:"🐠",hook:"AI预测鱼缸生态崩溃并给出换水建议",amount:"—",status:"active",cat:"home",star:2,desc:"Indiegogo项目，鱼缸生态智能监测，AI通过水质、温度、pH等多参数预测生态崩溃风险，提前3-7天预警。",barriers:["技术：水质AI预测模型","商业：硬件+传感器耗材","获客：水族爱好者社区","用户：鱼缸生态数据不可迁移"],survival:58,advice:"拓展到水产养殖商业场景，专业渔场对水质监测的付费意愿远高于个人用户。",china:"",links:{}},
+  {id:41,name:"AI Barista Desk",emoji:"☕",hook:"AI模拟顶级咖啡师手法的家庭冲泡平台",amount:"—",status:"active",cat:"home",star:3,desc:"AI驱动的家庭手冲咖啡平台，分析用户口感偏好，模拟世界顶级咖啡师的冲泡参数（水温、注水速度、时序），每次都能复现完美一杯。",barriers:["技术：冲泡参数AI优化","商业：硬件+精品咖啡豆订阅","获客：精品咖啡社区","用户：口感偏好数据"],survival:62,advice:"与蓝瓶咖啡等精品咖啡品牌合作，将设备作为顶级咖啡体验的入口。",china:"",links:{}},
+  {id:42,name:"AI Stargazer",emoji:"🔭",hook:"自动追踪并讲解星空背景知识的AI观星镜",amount:"—",status:"active",cat:"home",star:3,desc:"AI驱动的智能天文望远镜，自动识别并追踪天体，AI实时讲解天文知识，可连接手机直播，将复杂的天文观测变得平民化。",barriers:["技术：天体识别算法","商业：硬件+内容订阅","获客：天文爱好者社区","用户：观测记录积累"],survival:60,advice:"与学校天文课程合作，开发教育版套装，将产品推入STEM教育采购渠道。",china:"",links:{}},
+  {id:43,name:"AI E-Bike Dash",emoji:"🛵",hook:"针对外卖/长途骑行的AI路径优化显示器",amount:"—",status:"active",cat:"sport",star:3,desc:"专为电动自行车设计的AI仪表盘，实时路径优化，外卖骑手多订单路线规划，长途骑行体能管理，防盗警报。",barriers:["技术：多变量路径优化AI","商业：硬件+骑手订阅","获客：外卖骑手社区","用户：路径数据依赖"],survival:65,advice:"与美团、饿了么等平台合作，将AI路径优化与派单系统打通，成为B端标配设备。",china:"",links:{}},
+  {id:44,name:"AI Workout Mirror",emoji:"🏋",hook:"A3纸大小的AI健身辅助终端",amount:"—",status:"active",cat:"sport",star:3,desc:"超薄A3尺寸AI健身镜，可贴墙安装，AI实时检测动作姿态，给出矫正建议，内置课程库，支持与私人教练视频连线。",barriers:["技术：姿态识别AI","商业：硬件+健身课程订阅","获客：家庭健身媒体","用户：课程内容粘性"],survival:62,advice:"推出AI私教订阅服务，将人工教练和AI建议结合，比纯AI产品更有说服力。",china:"",links:{}},
+  {id:45,name:"AI Chess Board Pro",emoji:"♟",hook:"与AI对弈时有物理力度反馈的棋盘",amount:"—",status:"active",cat:"home",star:3,desc:"AI驱动的智能象棋棋盘，棋子自动移动（内置磁性机械机构），AI实时分析棋局，提供策略建议，可连接Chess.com在线对局。",barriers:["技术：机械棋子移动精度","商业：硬件一次性","获客：象棋和棋类爱好者","用户：棋局数据分析"],survival:65,advice:"与国际象棋联合会合作，推出锦标赛训练版，开发AI棋力评估报告服务。",china:"",links:{}},
+  {id:46,name:"AI Soil Sensor",emoji:"🌾",hook:"农场级AI土壤养分实时监测硬件",amount:"—",status:"active",cat:"home",star:2,desc:"Indiegogo项目，农业级土壤传感器阵列，AI实时分析NPK养分、pH、湿度、温度，结合气象数据给出精准施肥和灌溉建议，支持大面积农场部署。",barriers:["技术：农业AI模型","商业：传感器耗材+SaaS","获客：农业科技渠道","用户：土壤历史数据"],survival:60,advice:"与化肥和农药公司合作，用精准农业减少化学品用量，成为ESG报告的数据来源。",china:"",links:{}},
+  {id:47,name:"AI Sleep Mask v3",emoji:"😴",hook:"根据脑电波AI调节光线与白噪音的眼罩",amount:"—",status:"active",cat:"health",star:4,desc:"DreamPilot AI睡眠眼罩，内置EEG脑电波传感器，AI实时监测睡眠深度，自适应调节白噪音、热敷和按摩强度，AI睡眠报告，100%遮光设计。",barriers:["技术：EEG信号处理+AI","商业：硬件+睡眠订阅","获客：睡眠健康媒体","用户：个人睡眠数据"],survival:70,advice:"与睡眠诊所合作，将EEG数据用于轻度睡眠障碍的非药物干预，建立医疗背书。",china:"",links:{}},
+  {id:48,name:"AI Backpack",emoji:"🎒",hook:"AI自动负载平衡提醒与内部物品检索功能",amount:"—",status:"active",cat:"home",star:1,desc:"内置压力传感器和物品识别系统的AI背包，实时监测负载分布，提醒姿势调整，AI记忆物品存放位置，支持语音查询钥匙在哪里。",barriers:["技术：物品识别传感器","商业：高端背包市场","获客：城市通勤者","用户：物品记忆数据"],survival:45,advice:"与高端旅行箱包品牌合作OEM，定位商旅人士的智能出行配件而非独立品牌。",china:"",links:{}},
+  {id:49,name:"AI Pet Feeder Health",emoji:"🐕",hook:"AI分析宠物进食速度变化进行预警",amount:"—",status:"active",cat:"home",star:3,desc:"智能宠物喂食器，AI通过摄像头和重量传感器分析宠物进食速度、食量变化，建立健康基线，异常时提前预警可能的健康问题。",barriers:["技术：宠物行为AI识别","商业：硬件+宠物粮订阅","获客：宠物主人社区","用户：宠物健康历史数据"],survival:65,advice:"与宠物保险公司合作，将设备纳入保险福利，用数据降低理赔率。",china:"",links:{}},
+  {id:50,name:"AI Coding Mastery",emoji:"💻",hook:"结合物理硬件的AI编程学习终端",amount:"—",status:"active",cat:"edu",star:2,desc:"AI驱动的实体编程学习终端，通过物理按钮和显示屏与AI编程教练交互，AI根据学习进度个性化调整教学路径，让编程学习更直观有触感。",barriers:["技术：个性化学习AI","商业：硬件+课程订阅","获客：编程教育市场","用户：学习进度数据"],survival:55,advice:"与编程教育机构合作，将硬件作为线下课程的辅助工具，进入To B教育采购。",china:"",links:{}}
+];
+
+// Merge admin data over base
+const products = baseProducts.map(base => {
+  if (!adminData) return base;
+  const saved = adminData.find(a => a.id === base.id);
+  return saved ? { ...base, ...saved } : base;
+});
+
+const wechatConcepts = [
+  {num:"01",icon:"💬",name:"WeMo — 微信情感机器人",sub:"你的微信AI人格，实体化了",features:["分析你的聊天风格，生成专属AI性格","当你忙碌时，自动回复微信讯息","对话质量打分，识别你真正重要的关系","家人模式：检测异常沉默，自动提醒关怀"]},
+  {num:"02",icon:"📡",name:"WePresence — 连接之环",sub:"一枚戒指，感知远方的你",features:["两枚配对戒指，感应彼此的心跳频率","发消息时轻震，让对方感受到你的存在","微信支付触碰付款，无需解锁手机","健康数据直接进入微信家庭圈"]},
+  {num:"03",icon:"🏥",name:"WeHealth Card — AI医疗健康证",sub:"微信成为你的全科医生",features:["NFC卡片 + 健康传感器贴片","碰一碰医院诊台，自动调出完整病历","AI分析微信聊天中的健康关键词","与微信支付打通，实现医保实时结算"]},
+  {num:"04",icon:"🎴",name:"WeNest — 家庭AI中枢",sub:"微信家族群，变成了实体",features:["桌面小屏，显示家族群实时动态","AI总结每天的家庭信息，每晚汇报","家人视频来电，直接投射到电视","宝宝监护模式：异常声音自动进群报警"]},
+  {num:"05",icon:"🌐",name:"WeMeet Air — AI名片空间",sub:"扫一扫，不再只是加好友",features:["AR投影对方的微信简介和共同好友","AI分析两人聊天记录，生成关系画像","商务场合：即时生成双方合作可能性","碰碰配对：两台设备相碰自动交换信息"]},
+  {num:"06",icon:"🔮",name:"WeMemory — 记忆水晶球",sub:"把你们的故事，装进一个球",features:["智能音箱形态，内置家庭AI助手","语音激活，播放某段关键回忆的聊天记录","AI提醒：今天是你们认识的第1000天","家庭时间胶囊：定时解锁储存的消息和照片"]}
+];
+
+const survivalData = [
+  {name:"Unitree Go2",prob:90,tier:"high",advice:"加速企业安防巡检和教育版本"},
+  {name:"LivingAI EMO",prob:88,tier:"high",advice:"推出EMO家族多机联动，建立IP授权体系"},
+  {name:"Olares One",prob:85,tier:"high",advice:"整合企业级隐私计算，建立应用开发者生态"},
+  {name:"Ropet AI Pet",prob:82,tier:"high",advice:"推出宠物个性订阅，情感依附创造强粘性"},
+  {name:"Petoi Bittle X",prob:80,tier:"high",advice:"与大学和K-12教育建立长期课程合作"},
+  {name:"VITA RING",prob:78,tier:"high",advice:"申请医疗器械认证，与心脏科医院合作"},
+  {name:"Rokid Glasses",prob:78,tier:"high",advice:"聚焦B端商务翻译，AR眼镜最快商业化路径"},
+  {name:"Vinabot Talking Frame",prob:75,tier:"mid",advice:"开发数字遗产功能"},
+  {name:"RingConn Gen 2",prob:75,tier:"mid",advice:"开发睡眠改善处方，与医疗机构合作背书"},
+  {name:"Enabot EBO X",prob:72,tier:"mid",advice:"老龄化市场+保险合作，进入日本北欧市场"},
+  {name:"AI Sleep Mask v3",prob:70,tier:"mid",advice:"与睡眠诊所合作，建立医疗背书"},
+  {name:"Circular Ring Slim",prob:70,tier:"mid",advice:"CE医疗认证，进入欧洲数字医疗报销体系"},
+  {name:"Tachyon SBC",prob:70,tier:"mid",advice:"深化工业IoT，医疗设备边缘AI合作"},
+  {name:"Mirumi Companion",prob:72,tier:"mid",advice:"与床上用品和婴儿产品品牌联名"},
+  {name:"CODE27 Livehouse",prob:70,tier:"mid",advice:"开发虚拟偶像IP授权业务"},
+  {name:"CUDIS Ring",prob:68,tier:"mid",advice:"企业员工健康计划，与保险公司合作"},
+  {name:"Solar AI Shades",prob:68,tier:"mid",advice:"与房地产开发商合作大规模采购"},
+  {name:"Nexus GPU Expansion",prob:65,tier:"mid",advice:"推出托管云服务，拓展非技术用户群"},
+  {name:"AI Posture Pro",prob:65,tier:"mid",advice:"与企业员工福利计划合作进入B端"},
+  {name:"AI E-Bike Dash",prob:65,tier:"mid",advice:"与美团饿了么合作，成为B端标配"},
+  {name:"AI Pet Feeder Health",prob:65,tier:"mid",advice:"与宠物保险公司合作"},
+  {name:"StackChan",prob:65,tier:"mid",advice:"深化Matter智能家居控制"},
+  {name:"Doly Robotic",prob:62,tier:"mid",advice:"与K-12合作，打包AI编程教育套件"},
+  {name:"BUG Ethical Hacking",prob:60,tier:"mid",advice:"建立企业安全培训订阅服务"},
+  {name:"Zettlab AI NAS",prob:60,tier:"mid",advice:"开发相册AI搜索杀手级应用"},
+];
+
+const quadrantDots = [
+  {name:"LivingAI EMO",x:72,y:20,cat:"robot"},{name:"Unitree Go2",x:82,y:18,cat:"robot"},
+  {name:"Rokid Glasses",x:58,y:28,cat:"xr"},{name:"Olares One",x:72,y:35,cat:"compute"},
+  {name:"Ropet AI Pet",x:78,y:30,cat:"robot"},{name:"CUDIS Ring",x:68,y:42,cat:"health"},
+  {name:"RingConn Gen 2",x:58,y:45,cat:"health"},{name:"Circular Ring",x:88,y:48,cat:"health"},
+  {name:"Enabot EBO X",x:65,y:32,cat:"robot"},{name:"Petoi Bittle",x:68,y:55,cat:"edu"},
+  {name:"Nexus GPU",x:75,y:60,cat:"compute"},{name:"Tachyon SBC",x:65,y:62,cat:"compute"},
+  {name:"Zeroth Bot",x:58,y:68,cat:"edu"},{name:"ORIGINAL+ Skis",x:82,y:72,cat:"sport"},
+  {name:"Hitch Bottle",x:35,y:78,cat:"home"},{name:"AI Composter",x:42,y:70,cat:"home"},
+  {name:"NovaSmart Ring",x:45,y:55,cat:"health"},{name:"LCMD Server",x:55,y:65,cat:"compute"},
+  {name:"Doly Robotic",x:55,y:52,cat:"robot"},{name:"StackChan",x:52,y:58,cat:"robot"},
+  {name:"VITA RING",x:78,y:38,cat:"health"},{name:"CODE27 Live",x:82,y:28,cat:"robot"},
+  {name:"AI Sleep Mask",x:78,y:42,cat:"health"},{name:"Mirumi",x:65,y:26,cat:"robot"},
+  {name:"AI Posture",x:68,y:48,cat:"health"},{name:"Solar AI Shades",x:55,y:55,cat:"home"},
+  {name:"AI Barista",x:62,y:65,cat:"home"},{name:"EBO X",x:62,y:35,cat:"robot"},
+];
+
+const CATS = {robot:'机器人',health:'健康穿戴',compute:'AI算力',home:'智能家居',sport:'运动出行',edu:'教育开发',xr:'XR显示'};
+const CAT_COLORS = {robot:'#7c3aed',health:'#10b981',compute:'#00f5ff',home:'#fbbf24',sport:'#f472b6',edu:'#3b82f6',xr:'#f97316'};
+
+// ── WECHAT VISIBILITY ──
+if (!showWechat) {
+  document.getElementById('wechat').style.display = 'none';
+  document.getElementById('nav-wechat').style.display = 'none';
+  // hide the divider before wechat
+  const divs = document.querySelectorAll('.full-divider');
+  if (divs.length >= 5) divs[divs.length - 2].style.display = 'none';
+}
+
+// ── HERO CANVAS ──
+const canvas = document.getElementById('hero-canvas');
+const ctx2 = canvas.getContext('2d');
+let particles = [];
+function resizeCanvas(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;}
+function initParticles(){particles=[];for(let i=0;i<80;i++)particles.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:(Math.random()-0.5)*0.3,vy:(Math.random()-0.5)*0.3,r:Math.random()*1.5+0.5,opacity:Math.random()*0.5+0.2});}
+function animateParticles(){
+  ctx2.clearRect(0,0,canvas.width,canvas.height);
+  particles.forEach((p,i)=>{
+    p.x+=p.vx;p.y+=p.vy;
+    if(p.x<0||p.x>canvas.width)p.vx*=-1;
+    if(p.y<0||p.y>canvas.height)p.vy*=-1;
+    ctx2.beginPath();ctx2.arc(p.x,p.y,p.r,0,Math.PI*2);
+    ctx2.fillStyle=`rgba(0,245,255,${p.opacity})`;ctx2.fill();
+    particles.forEach((p2,j)=>{
+      if(j<=i)return;
+      const dx=p.x-p2.x,dy=p.y-p2.y,dist=Math.sqrt(dx*dx+dy*dy);
+      if(dist<100){ctx2.beginPath();ctx2.moveTo(p.x,p.y);ctx2.lineTo(p2.x,p2.y);ctx2.strokeStyle=`rgba(0,245,255,${0.1*(1-dist/100)})`;ctx2.lineWidth=0.5;ctx2.stroke();}
+    });
+  });
+  requestAnimationFrame(animateParticles);
+}
+resizeCanvas();initParticles();animateParticles();
+window.addEventListener('resize',()=>{resizeCanvas();initParticles();});
+
+// ── COUNT UP ──
+const obs1=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting){document.querySelectorAll('[data-count]').forEach(el=>{let c=0,target=parseInt(el.dataset.count),suf=el.dataset.suffix||'';const t=setInterval(()=>{c=Math.min(c+target/60,target);el.textContent=Math.round(c)+suf;if(c>=target)clearInterval(t);},20);});obs1.disconnect();}});
+},{threshold:0.5});
+obs1.observe(document.querySelector('.hero-stats'));
+
+// ── NAV ──
+const nav=document.getElementById('nav');
+window.addEventListener('scroll',()=>{
+  nav.classList.toggle('visible',window.scrollY>100);
+  document.querySelectorAll('.nav-links a').forEach(a=>{
+    const sec=document.querySelector(a.getAttribute('href'));
+    if(sec){const r=sec.getBoundingClientRect();a.classList.toggle('active',r.top<=100&&r.bottom>100);}
+  });
+});
+
+// ── FADE UP ──
+const fadeObs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');});},{threshold:0.1});
+document.querySelectorAll('.fade-up').forEach(el=>fadeObs.observe(el));
+
+// ── SPOTLIGHT ──
+function renderSpotlight(){
+  const grid = document.getElementById('spotlight-grid');
+  const featured = featuredIds.map(id => products.find(p => p.id === id)).filter(Boolean);
+  if (!featured.length) { document.getElementById('spotlight').style.display='none'; return; }
+  grid.innerHTML = featured.map((p, i) => `
+    <div class="spotlight-card" onclick="openModal(${p.id})">
+      <div class="sp-rank">TOP ${i+1} · FEATURED</div>
+      <span class="sp-emoji">${p.emoji}</span>
+      <div class="sp-name">${p.name}</div>
+      <div class="sp-hook">${p.hook}</div>
+      <div class="sp-stars">${'★'.repeat(p.star)}${'☆'.repeat(5-p.star)}</div>
+    </div>
+  `).join('');
+}
+
+// ── PRODUCTS GRID ──
+function renderProducts(filter='all'){
+  const grid=document.getElementById('products-grid');
+  // Use admin order if available, otherwise default order
+  let list = adminData ? [...products].sort((a,b)=>{
+    const ai=adminData.findIndex(x=>x.id===a.id);
+    const bi=adminData.findIndex(x=>x.id===b.id);
+    return (ai===-1?999:ai)-(bi===-1?999:bi);
+  }) : products;
+  const filtered=filter==='all'?list:list.filter(p=>p.cat===filter);
+  grid.innerHTML=filtered.map(p=>{
+    const lk=p.links||{};
+    const linkTags=Object.entries({official:'🌐官网',yt1:'▶测评',yt2:'▶测评2',ks:'🛒众筹'})
+      .filter(([k])=>lk[k])
+      .map(([k,label])=>`<a class="card-link" href="${lk[k]}" target="_blank" rel="noopener">${label}</a>`)
+      .join('');
+    return `<div class="product-card" onclick="openModal(${p.id})" data-cat="${p.cat}">
+      <div class="card-num">${p.id<=25?'✅':'🚀'} #${p.id}</div>
+      <span class="card-emoji">${p.emoji}</span>
+      <div class="card-name">${p.name}</div>
+      <div class="card-hook">${p.hook}</div>
+      <div class="card-meta">
+        <span class="card-amount">${p.amount}</span>
+        <span class="card-badge ${p.status==='done'?'badge-done':p.status==='active'?'badge-active':'badge-ship'}">${p.status==='done'?'已完成':p.status==='active'?'众筹中':'交付中'}</span>
+      </div>
+      <div class="card-cat" style="color:${CAT_COLORS[p.cat]}">${CATS[p.cat]||p.cat}</div>
+      <div class="card-stars">${'★'.repeat(p.star)}${'☆'.repeat(5-p.star)}</div>
+      ${linkTags?`<div class="card-links">${linkTags}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+document.querySelectorAll('.filter-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    renderProducts(btn.dataset.filter);
+  });
+});
+
+// ── MODAL ──
+function openModal(id){
+  const p=products.find(x=>x.id===id);if(!p)return;
+  document.getElementById('m-emoji').textContent=p.emoji;
+  document.getElementById('m-title').textContent=p.name;
+  document.getElementById('m-tag').textContent=`${CATS[p.cat]||p.cat} · ${p.amount} · ${p.status==='done'?'已成功':p.status==='active'?'众筹中':'交付中'}`;
+  const surv=survivalData.find(s=>s.name===p.name);
+  const lk=p.links||{};
+  const modalLinks=Object.entries({official:'🌐 官方网站',yt1:'▶ YouTube 测评1',yt2:'▶ YouTube 测评2',ks:'🛒 众筹页面'})
+    .filter(([k])=>lk[k])
+    .map(([k,label])=>`<a class="modal-link" href="${lk[k]}" target="_blank" rel="noopener">${label}</a>`)
+    .join('');
+  document.getElementById('m-body').innerHTML=`
+    ${modalLinks?`<div class="modal-section"><div class="modal-section-title">相关链接</div><div class="modal-links">${modalLinks}</div></div>`:''}
+    <div class="modal-section"><div class="modal-section-title">产品描述</div><p>${p.desc}</p></div>
+    <div class="modal-section">
+      <div class="modal-section-title">驱动力 & 关注度</div>
+      <div class="modal-grid">
+        <div class="modal-metric"><div class="metric-label">关注度评级</div><div class="metric-value">${'★'.repeat(p.star)} ${p.star}/5</div></div>
+        <div class="modal-metric"><div class="metric-label">存活率预测</div><div class="metric-value">${surv?surv.prob+'%':'—'}</div></div>
+      </div>
+    </div>
+    <div class="modal-section">
+      <div class="modal-section-title">四大壁垒分析</div>
+      <ul class="barrier-list">${(p.barriers||[]).map((b,i)=>{const icons=['🏦','⚙️','📣','🧠'];const parts=b.split('：');return`<li><div class="barrier-icon">${icons[i]||'•'}</div><div><div class="barrier-title">${parts[0]||''}</div><div>${parts[1]||''}</div></div></li>`}).join('')}</ul>
+    </div>
+    ${surv?`<div class="modal-section">
+      <div class="modal-section-title">存活预测</div>
+      <div class="survival-bar">
+        <div class="sbar-label">2-3年存活概率</div>
+        <div class="sbar-track"><div class="sbar-fill ${surv.tier==='high'?'sbar-high':surv.tier==='mid'?'sbar-mid':'sbar-low'}" style="width:${surv.prob}%"></div></div>
+        <div style="font-family:'Space Mono',monospace;font-size:0.75rem;margin-top:0.5rem;color:${surv.tier==='high'?'var(--green)':surv.tier==='mid'?'var(--amber)':'var(--red)'}">${surv.prob}%</div>
+      </div>
+      <div class="survival-bar" style="margin-top:0.75rem"><div class="sbar-label">迭代建议</div><p style="font-size:0.82rem;color:var(--text);margin-top:0.5rem">${surv.advice}</p></div>
+    </div>`:''}
+    ${p.china?`<div class="modal-section"><div class="modal-section-title">中国市场策略</div><p>${p.china}</p></div>`:''}
+  `;
+  document.getElementById('modal-overlay').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeModal(){document.getElementById('modal-overlay').classList.remove('open');document.body.style.overflow='';}
+document.getElementById('modal-overlay').addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal();});
+
+// ── VS CHART ──
+document.getElementById('vs-chart').innerHTML=[
+  {label:"机器人/陪伴",ai:75,hw:25},{label:"健康穿戴",ai:55,hw:45},
+  {label:"AI算力/服务器",ai:60,hw:40},{label:"智能家居",ai:45,hw:55},
+  {label:"运动/出行",ai:50,hw:50},{label:"教育/开发者",ai:65,hw:35},
+].map(d=>`<div class="vs-row"><div class="vs-label">${d.label}</div><div class="vs-bars"><div class="vs-bar-ai" style="width:${d.ai}%">${d.ai}%</div><div class="vs-bar-hw" style="width:${d.hw}%">${d.hw}%</div></div></div>`).join('')+
+`<div style="display:flex;gap:1rem;margin-top:0.75rem;font-size:0.65rem;font-family:'Space Mono',monospace"><span style="display:flex;align-items:center;gap:0.4rem"><span style="width:10px;height:10px;background:var(--purple);border-radius:2px"></span>AI驱动</span><span style="display:flex;align-items:center;gap:0.4rem"><span style="width:10px;height:10px;background:rgba(0,245,255,0.4);border-radius:2px"></span>硬件驱动</span></div>`;
+
+// ── CHARTS ──
+new Chart(document.getElementById('scatter-chart').getContext('2d'),{type:'bubble',data:{datasets:[
+  {label:'机器人',data:[{x:75,y:120,r:18},{x:82,y:200,r:25},{x:78,y:80,r:15},{x:65,y:80,r:12}],backgroundColor:'rgba(124,58,237,0.6)',borderColor:'rgba(124,58,237,0.8)',borderWidth:1},
+  {label:'健康穿戴',data:[{x:58,y:100,r:16},{x:68,y:100,r:15},{x:88,y:50,r:12}],backgroundColor:'rgba(16,185,129,0.6)',borderColor:'rgba(16,185,129,0.8)',borderWidth:1},
+  {label:'AI算力',data:[{x:72,y:230,r:22},{x:58,y:50,r:12},{x:65,y:40,r:11}],backgroundColor:'rgba(0,245,255,0.6)',borderColor:'rgba(0,245,255,0.8)',borderWidth:1},
+  {label:'智能家居',data:[{x:42,y:30,r:10},{x:45,y:80,r:13}],backgroundColor:'rgba(251,191,36,0.6)',borderColor:'rgba(251,191,36,0.8)',borderWidth:1},
+  {label:'XR显示',data:[{x:58,y:400,r:28}],backgroundColor:'rgba(249,115,22,0.6)',borderColor:'rgba(249,115,22,0.8)',borderWidth:1},
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#64748b',font:{size:11}}},tooltip:{callbacks:{label:c=>`${c.dataset.label}: AI深度${c.raw.x}% | $${c.raw.y}万`}}},scales:{x:{title:{display:true,text:'AI技术深度 →',color:'#64748b',font:{size:11}},min:30,max:100,ticks:{color:'#64748b'},grid:{color:'rgba(255,255,255,0.05)'}},y:{title:{display:true,text:'众筹金额（万美元）',color:'#64748b',font:{size:11}},ticks:{color:'#64748b'},grid:{color:'rgba(255,255,255,0.05)'}}}}});
+
+// ── SURVIVAL TABLE ──
+document.getElementById('survival-table').innerHTML=`<thead><tr><th>产品</th><th>存活概率</th><th>评级</th><th>核心建议</th></tr></thead><tbody>${survivalData.map(s=>`<tr><td style="font-weight:600">${s.name}</td><td><div class="prob-bar"><div class="prob-track"><div class="prob-fill ${s.tier==='high'?'sbar-high':s.tier==='mid'?'sbar-mid':'sbar-low'}" style="width:${s.prob}%"></div></div><span class="prob-num" style="color:${s.tier==='high'?'var(--green)':s.tier==='mid'?'var(--amber)':'var(--red)'}">${s.prob}%</span></div></td><td><span class="card-badge ${s.tier==='high'?'badge-done':s.tier==='mid'?'badge-ship':''}" style="${s.tier==='low'?'background:rgba(239,68,68,0.1);color:var(--red);border:1px solid rgba(239,68,68,0.3)':''}">${s.tier==='high'?'高确定性':s.tier==='mid'?'中等风险':'高风险'}</span></td><td style="color:var(--muted);font-size:0.78rem">${s.advice}</td></tr>`).join('')}</tbody>`;
+
+// ── COMPARE CHART ──
+new Chart(document.getElementById('compare-chart').getContext('2d'),{type:'bar',data:{labels:['机器人','健康穿戴','AI算力','智能家居','运动','教育','XR'],datasets:[{label:'成功案例',data:[8,5,6,3,2,4,1],backgroundColor:'rgba(124,58,237,0.7)',borderRadius:3},{label:'活跃案例',data:[6,6,3,9,3,4,0],backgroundColor:'rgba(0,245,255,0.4)',borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#64748b',font:{size:10}}}},scales:{x:{ticks:{color:'#64748b',font:{size:10}},grid:{display:false}},y:{ticks:{color:'#64748b',font:{size:10}},grid:{color:'rgba(255,255,255,0.05)'}}}}});
+
+// ── QUADRANT ──
+const qWrap=document.getElementById('quadrant-dots');
+quadrantDots.forEach(dot=>{
+  const el=document.createElement('div');
+  el.className='q-dot';el.style.left=dot.x+'%';el.style.top=dot.y+'%';
+  el.style.background=CAT_COLORS[dot.cat]||'#888';
+  el.style.boxShadow=`0 0 8px ${CAT_COLORS[dot.cat]||'#888'}`;
+  el.innerHTML=`<div class="q-dot-label">${dot.name}</div>`;
+  qWrap.appendChild(el);
+});
+
+// ── WECHAT CONCEPTS ──
+document.getElementById('wechat-grid').innerHTML=wechatConcepts.map(w=>`
+  <div class="wc-concept">
+    <div class="wc-num">${w.num}</div>
+    <div class="wc-icon">${w.icon}</div>
+    <div class="wc-name">${w.name}</div>
+    <div class="wc-sub">${w.sub}</div>
+    <ul class="wc-features">${w.features.map(f=>`<li>${f}</li>`).join('')}</ul>
+  </div>`).join('');
+
+// ── SCROLL SMOOTH ──
+document.querySelectorAll('a[href^="#"]').forEach(a=>{
+  a.addEventListener('click',e=>{e.preventDefault();const t=document.querySelector(a.getAttribute('href'));if(t)t.scrollIntoView({behavior:'smooth',block:'start'});});
+});
+
+// ── INIT ──
+renderSpotlight();
+renderProducts();
+</script>
+</body>
+</html>

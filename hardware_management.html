@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI硬件报告 · 管理后台</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Noto+Sans+SC:wght@300;400;500;700&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#050810;--bg2:#0a0f1e;--bg3:#0f1628;--bg4:#141e35;--cyan:#00f5ff;--amber:#fbbf24;--green:#10b981;--red:#ef4444;--text:#e2e8f0;--muted:#64748b;--border:rgba(0,245,255,0.12);--b2:rgba(255,255,255,0.06);}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans SC',sans-serif;font-size:14px;display:flex;height:100vh;overflow:hidden;}
+#sidebar{width:220px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;height:100vh;}
+.slogo{padding:1.4rem 1.25rem 1.2rem;border-bottom:1px solid var(--border);}
+.slogo-s{font-family:'Space Mono',monospace;font-size:0.52rem;color:var(--cyan);letter-spacing:.25em;text-transform:uppercase;margin-bottom:.35rem;}
+.slogo-t{font-family:'Orbitron',sans-serif;font-size:.85rem;font-weight:700;line-height:1.3;}
+.sstats{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--border);}
+.ss{padding:.8rem 1rem;text-align:center;border-right:1px solid var(--border);}
+.ss:last-child{border-right:none;}
+.ss-n{font-family:'Orbitron',sans-serif;font-size:1.25rem;font-weight:700;color:var(--cyan);text-shadow:0 0 12px rgba(0,245,255,.4);line-height:1;}
+.ss-l{font-size:.55rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-top:.3rem;}
+.snav{flex:1;overflow-y:auto;padding:.6rem 0;}
+.nlbl{font-family:'Space Mono',monospace;font-size:.5rem;color:var(--muted);letter-spacing:.2em;text-transform:uppercase;padding:.8rem 1.2rem .35rem;}
+.ni{display:flex;align-items:center;gap:.55rem;padding:.5rem 1.2rem;cursor:pointer;color:var(--muted);font-size:.78rem;transition:all .15s;border-left:2px solid transparent;}
+.ni:hover{color:var(--text);background:rgba(255,255,255,.03);}
+.ni.active{color:var(--cyan);background:rgba(0,245,255,.07);border-left-color:var(--cyan);}
+.nc{margin-left:auto;font-family:'Space Mono',monospace;font-size:.55rem;background:var(--bg3);color:var(--muted);padding:.12rem .4rem;border-radius:100px;border:1px solid var(--b2);}
+.sbot{padding:.875rem;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:.45rem;}
+.btn{display:flex;align-items:center;justify-content:center;gap:.4rem;padding:.5rem .875rem;border-radius:6px;font-size:.73rem;font-family:'Noto Sans SC',sans-serif;cursor:pointer;transition:all .2s;border:none;font-weight:500;}
+.bc{background:var(--cyan);color:#050810;}.bc:hover{background:#00ddee;transform:translateY(-1px);}
+.bo{background:transparent;color:var(--muted);border:1px solid var(--b2);}.bo:hover{border-color:var(--border);color:var(--text);}
+#main{flex:1;display:flex;flex-direction:column;overflow:hidden;height:100vh;}
+#topbar{height:50px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 1.4rem;gap:1rem;flex-shrink:0;}
+.tcrumb{font-size:.76rem;color:var(--muted);display:flex;align-items:center;gap:.5rem;}
+.tcrumb span{color:var(--text);font-weight:500;}
+.tright{margin-left:auto;display:flex;align-items:center;gap:.7rem;}
+.ubadge{display:none;font-family:'Space Mono',monospace;font-size:.58rem;background:rgba(251,191,36,.15);color:var(--amber);border:1px solid rgba(251,191,36,.3);padding:.22rem .6rem;border-radius:100px;animation:pb 2s ease-in-out infinite;}
+.ubadge.show{display:block;}
+@keyframes pb{0%,100%{opacity:1}50%{opacity:.6}}
+.sw{display:flex;align-items:center;gap:.45rem;background:var(--bg3);border:1px solid var(--b2);border-radius:6px;padding:.32rem .7rem;transition:border-color .2s;}
+.sw:focus-within{border-color:var(--border);}
+.sw input{background:none;border:none;outline:none;color:var(--text);font-size:.76rem;font-family:'Noto Sans SC',sans-serif;width:175px;}
+.sw input::placeholder{color:var(--muted);}
+#fbar{padding:.6rem 1.4rem;border-bottom:1px solid var(--b2);background:var(--bg2);display:flex;gap:.4rem;align-items:center;flex-shrink:0;flex-wrap:wrap;}
+.chip{font-family:'Space Mono',monospace;font-size:.58rem;padding:.26rem .65rem;border-radius:100px;border:1px solid var(--b2);background:none;color:var(--muted);cursor:pointer;transition:all .15s;letter-spacing:.05em;text-transform:uppercase;}
+.chip:hover{border-color:rgba(0,245,255,.2);color:var(--text);}
+.chip.active{background:rgba(0,245,255,.1);border-color:var(--border);color:var(--cyan);}
+.csep{width:1px;height:13px;background:var(--b2);}
+#ta{flex:1;overflow-y:auto;overflow-x:auto;}
+table{width:100%;border-collapse:collapse;min-width:1060px;}
+thead tr{background:var(--bg3);position:sticky;top:0;z-index:20;}
+th{font-family:'Space Mono',monospace;font-size:.56rem;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;padding:.7rem .85rem;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap;cursor:pointer;user-select:none;}
+th:hover{color:var(--text);}th.sorted{color:var(--cyan);}
+tbody tr{border-bottom:1px solid var(--b2);transition:background .1s;}
+tbody tr:hover{background:rgba(255,255,255,.015);}
+tbody tr.ed{background:rgba(251,191,36,.04);}
+td{padding:.42rem .85rem;vertical-align:middle;}
+.ein{background:none;border:1px solid transparent;color:var(--text);font-size:.76rem;font-family:'Noto Sans SC',sans-serif;padding:.26rem .38rem;border-radius:4px;width:100%;transition:all .15s;outline:none;resize:none;}
+.ein:hover{border-color:var(--b2);}.ein:focus{border-color:var(--border);background:var(--bg4);}
+select.ein{cursor:pointer;background:var(--bg3);-webkit-appearance:none;}select.ein:focus{background:var(--bg4);}
+.emono{background:none;border:1px solid transparent;color:var(--cyan);font-family:'Space Mono',monospace;font-size:.68rem;padding:.26rem .38rem;border-radius:4px;width:100%;outline:none;transition:all .15s;}
+.emono:hover{border-color:var(--b2);}.emono:focus{border-color:var(--border);background:var(--bg4);}
+.stars{display:flex;gap:2px;}
+.star{font-size:.95rem;cursor:pointer;color:var(--muted);opacity:.3;transition:all .1s;user-select:none;}
+.star.lit{color:var(--amber);opacity:1;text-shadow:0 0 6px rgba(251,191,36,.5);}
+.star:hover{transform:scale(1.25);opacity:1;}
+.sw2{display:flex;align-items:center;gap:5px;}
+.sb{height:3px;background:rgba(255,255,255,.07);border-radius:100px;overflow:hidden;width:48px;}
+.sf{height:100%;border-radius:100px;}
+.shi{background:linear-gradient(90deg,var(--green),#34d399);}
+.smi{background:linear-gradient(90deg,var(--amber),#f59e0b);}
+.slo{background:linear-gradient(90deg,var(--red),#f87171);}
+.snum{font-family:'Space Mono',monospace;font-size:.63rem;min-width:24px;text-align:right;color:var(--muted);}
+.ab{background:none;border:none;cursor:pointer;font-size:.82rem;padding:.26rem .38rem;border-radius:4px;color:var(--muted);transition:all .15s;}
+.ab:hover{background:rgba(255,255,255,.06);color:var(--cyan);}
+.empty{padding:4rem;text-align:center;color:var(--muted);}
+#panel{position:fixed;top:0;right:-500px;width:480px;height:100vh;background:var(--bg2);border-left:1px solid var(--border);z-index:100;transition:right .3s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;overflow:hidden;}
+#panel.open{right:0;}
+.ph{padding:1.4rem;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-start;flex-shrink:0;}
+.ph-e{font-size:1.9rem;margin-bottom:.35rem;}
+.ph-n{font-size:1.05rem;font-weight:700;}
+.ph-m{font-family:'Space Mono',monospace;font-size:.6rem;color:var(--cyan);margin-top:.2rem;}
+.ph-x{background:none;border:none;color:var(--muted);font-size:1.1rem;cursor:pointer;padding:.2rem;transition:color .15s;}
+.ph-x:hover{color:var(--text);}
+.pb2{flex:1;overflow-y:auto;padding:1.4rem;}
+.ps{margin-bottom:1.4rem;}
+.pl{font-family:'Space Mono',monospace;font-size:.56rem;color:var(--cyan);letter-spacing:.2em;text-transform:uppercase;margin-bottom:.45rem;display:block;}
+.pi{width:100%;background:var(--bg3);border:1px solid var(--b2);color:var(--text);font-family:'Noto Sans SC',sans-serif;font-size:.8rem;padding:.55rem .7rem;border-radius:6px;outline:none;transition:border-color .15s;resize:vertical;line-height:1.6;}
+.pi:focus{border-color:var(--border);}
+.pr{display:flex;gap:.7rem;}.pr .pi{flex:1;}
+.bstars{display:flex;gap:4px;align-items:center;}
+.bs{font-size:1.55rem;cursor:pointer;color:var(--muted);opacity:.3;transition:all .1s;user-select:none;}
+.bs.lit{color:var(--amber);opacity:1;text-shadow:0 0 10px rgba(251,191,36,.5);}
+.bs:hover{transform:scale(1.12);opacity:1;}
+.sht{margin-left:.45rem;font-family:'Space Mono',monospace;font-size:.6rem;color:var(--muted);}
+.pfoot{padding:.9rem 1.4rem;border-top:1px solid var(--border);display:flex;gap:.7rem;flex-shrink:0;}
+#toast{position:fixed;bottom:1.75rem;left:50%;transform:translateX(-50%) translateY(14px);background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:.65rem 1.3rem;border-radius:8px;font-size:.8rem;opacity:0;transition:all .3s;pointer-events:none;z-index:9999;}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+::-webkit-scrollbar{width:4px;height:4px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--border);border-radius:100px;}::-webkit-scrollbar-thumb:hover{background:rgba(0,245,255,.25);}
+.link-row{display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem;}
+.link-icon{font-size:1rem;flex-shrink:0;width:22px;text-align:center;}
+.link-inp{flex:1;background:var(--bg3);border:1px solid var(--b2);color:var(--text);font-family:'Space Mono',monospace;font-size:.7rem;padding:.45rem .65rem;border-radius:6px;outline:none;transition:border-color .15s;}
+.link-inp:focus{border-color:var(--border);}
+.link-inp::placeholder{color:var(--muted);font-size:.66rem;}
+.link-go{flex-shrink:0;background:none;border:1px solid var(--b2);color:var(--muted);font-size:.75rem;padding:.4rem .55rem;border-radius:5px;cursor:pointer;transition:all .15s;text-decoration:none;display:flex;align-items:center;}
+.link-go:hover{border-color:var(--cyan);color:var(--cyan);}
+.link-go.disabled{opacity:.3;pointer-events:none;}
+
+/* ── SETTINGS MODAL ── */
+#settings-overlay{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.75);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:2rem;}
+#settings-overlay.open{display:flex;}
+#settings-modal{background:var(--bg2);border:1px solid var(--border);border-radius:8px;width:560px;max-height:85vh;overflow-y:auto;box-shadow:0 0 40px rgba(0,245,255,0.1);}
+.sm-head{padding:1.5rem;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+.sm-title{font-family:'Orbitron',sans-serif;font-size:1rem;font-weight:700;color:var(--cyan);}
+.sm-x{background:none;border:none;color:var(--muted);font-size:1.1rem;cursor:pointer;transition:color .15s;}
+.sm-x:hover{color:var(--text);}
+.sm-body{padding:1.5rem;}
+.sm-sec{margin-bottom:1.75rem;}
+.sm-lbl{font-family:'Space Mono',monospace;font-size:0.58rem;color:var(--cyan);letter-spacing:.2em;text-transform:uppercase;margin-bottom:.75rem;display:block;}
+.sm-desc{font-size:0.78rem;color:var(--muted);margin-bottom:1rem;line-height:1.6;}
+.featured-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin-bottom:0.75rem;}
+.feat-slot{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:0.6rem 0.4rem;text-align:center;cursor:pointer;transition:all .15s;min-height:64px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;}
+.feat-slot:hover{border-color:var(--amber);background:rgba(251,191,36,0.07);}
+.feat-slot.filled{border-color:rgba(251,191,36,0.5);background:rgba(251,191,36,0.06);}
+.feat-emoji{font-size:1.2rem;}
+.feat-name{font-size:0.6rem;color:var(--text);line-height:1.2;max-width:60px;}
+.feat-rank{font-family:'Space Mono',monospace;font-size:0.5rem;color:var(--amber);}
+.feat-slot.empty .feat-name{color:var(--muted);}
+.prod-picker{max-height:220px;overflow-y:auto;border:1px solid var(--border);border-radius:6px;background:var(--bg3);}
+.pp-item{display:flex;align-items:center;gap:0.6rem;padding:0.5rem 0.8rem;cursor:pointer;transition:background .1s;border-bottom:1px solid rgba(255,255,255,0.04);font-size:0.8rem;}
+.pp-item:hover{background:rgba(255,255,255,0.04);}
+.pp-item.selected{background:rgba(251,191,36,0.08);color:var(--amber);}
+.pp-item .pp-em{font-size:1rem;flex-shrink:0;}
+.pp-item .pp-nm{flex:1;font-weight:500;}
+.pp-item .pp-st{font-family:'Space Mono',monospace;font-size:0.58rem;color:var(--amber);}
+.pp-search{width:100%;background:var(--bg4);border:none;border-bottom:1px solid var(--border);color:var(--text);font-family:'Noto Sans SC',sans-serif;font-size:0.8rem;padding:0.6rem 0.8rem;outline:none;}
+.pp-search::placeholder{color:var(--muted);}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:0.75rem 1rem;background:var(--bg3);border:1px solid var(--border);border-radius:6px;}
+.toggle-label{font-size:0.85rem;color:var(--text);}
+.toggle-sub{font-size:0.72rem;color:var(--muted);margin-top:2px;}
+.toggle-switch{position:relative;width:44px;height:24px;flex-shrink:0;}
+.toggle-switch input{opacity:0;width:0;height:0;}
+.toggle-slider{position:absolute;inset:0;background:rgba(255,255,255,0.1);border-radius:100px;cursor:pointer;transition:all .2s;}
+.toggle-slider::before{content:'';position:absolute;width:18px;height:18px;left:3px;top:3px;background:var(--muted);border-radius:50%;transition:all .2s;}
+.toggle-switch input:checked + .toggle-slider{background:rgba(16,185,129,0.3);}
+.toggle-switch input:checked + .toggle-slider::before{transform:translateX(20px);background:var(--green);}
+.sm-foot{padding:1rem 1.5rem;border-top:1px solid var(--border);display:flex;gap:0.75rem;}
+</style>
+</head>
+<body>
+<div id="sidebar">
+  <div class="slogo"><div class="slogo-s">Admin Console</div><div class="slogo-t">AI × HW<br>Report Editor</div></div>
+  <div class="sstats">
+    <div class="ss"><div class="ss-n" id="sn-t">50</div><div class="ss-l">产品总数</div></div>
+    <div class="ss"><div class="ss-n" id="sn-e" style="color:var(--amber)">0</div><div class="ss-l">已修改</div></div>
+  </div>
+  <div class="snav">
+    <div class="nlbl">品类筛选</div>
+    <div class="ni active" onclick="setF('all',this)"><span>📦</span>全部产品<span class="nc" id="nc-all">50</span></div>
+    <div class="ni" onclick="setF('robot',this)"><span>🤖</span>机器人<span class="nc" id="nc-robot"></span></div>
+    <div class="ni" onclick="setF('health',this)"><span>💊</span>健康穿戴<span class="nc" id="nc-health"></span></div>
+    <div class="ni" onclick="setF('compute',this)"><span>🖥</span>AI算力<span class="nc" id="nc-compute"></span></div>
+    <div class="ni" onclick="setF('home',this)"><span>🏠</span>智能家居<span class="nc" id="nc-home"></span></div>
+    <div class="ni" onclick="setF('sport',this)"><span>🚴</span>运动出行<span class="nc" id="nc-sport"></span></div>
+    <div class="ni" onclick="setF('edu',this)"><span>🎓</span>教育开发<span class="nc" id="nc-edu"></span></div>
+    <div class="ni" onclick="setF('xr',this)"><span>🥽</span>XR显示<span class="nc" id="nc-xr"></span></div>
+    <div class="nlbl">关注度</div>
+    <div class="ni" onclick="setF('star5',this)"><span>⭐</span>5星重点关注</div>
+    <div class="ni" onclick="setF('star4',this)"><span>★</span>4星以上</div>
+    <div class="nlbl">状态</div>
+    <div class="ni" onclick="setF('done',this)"><span>✅</span>已成功</div>
+    <div class="ni" onclick="setF('active',this)"><span>🚀</span>众筹中</div>
+    <div class="ni" onclick="setF('ship',this)"><span>📦</span>交付中</div>
+    <div class="nlbl">快捷</div>
+    <div class="ni" onclick="setF('__ed__',null)"><span>✏️</span>仅已修改</div>
+  </div>
+  <div class="sbot">
+    <button class="btn bc" onclick="saveAll()">💾 保存全部修改</button>
+    <button class="btn bo" onclick="openSettings()">⚙️ 前端展示设置</button>
+    <button class="btn bo" onclick="exportJSON()">📤 导出 JSON</button>
+    <button class="btn bo" onclick="resetAll()">↩ 重置数据</button>
+  </div>
+</div>
+
+<div id="main">
+  <div id="topbar">
+    <div class="tcrumb">管理后台 ›<span id="crumb">全部产品</span></div>
+    <div class="tright">
+      <div class="ubadge" id="ubadge">● 有未保存的修改</div>
+      <div class="sw"><span style="color:var(--muted)">🔍</span><input id="q" placeholder="搜索产品名称、描述..." oninput="render()"></div>
+    </div>
+  </div>
+  <div id="fbar">
+    <button class="chip active" onclick="setS('id',this)">ID 排序</button>
+    <button class="chip" onclick="setS('star',this)">关注度 ↓</button>
+    <button class="chip" onclick="setS('surv',this)">存活率 ↓</button>
+    <div class="csep"></div>
+    <button class="chip" onclick="setF('__ed__',null)">仅已修改</button>
+  </div>
+  <div id="ta">
+    <table>
+      <thead><tr>
+        <th style="width:52px">#</th>
+        <th style="width:132px">关注度 ⭐</th>
+        <th style="width:50px">图标</th>
+        <th style="width:145px">产品名称</th>
+        <th style="width:98px">品类</th>
+        <th style="width:88px">状态</th>
+        <th style="width:82px">融资金额</th>
+        <th>核心 Hook</th>
+        <th style="width:108px">存活率</th>
+        <th style="width:50px">详情</th>
+      </tr></thead>
+      <tbody id="tbody"></tbody>
+    </table>
+    <div class="empty" id="empty" style="display:none">没有找到匹配的产品</div>
+  </div>
+</div>
+
+<div id="panel">
+  <div class="ph">
+    <div><div class="ph-e" id="pe">🤖</div><div class="ph-n" id="pn">—</div><div class="ph-m" id="pm">—</div></div>
+    <button class="ph-x" onclick="closeP()">✕</button>
+  </div>
+  <div class="pb2">
+    <div class="ps"><span class="pl">关注度评级</span><div class="bstars" id="bstars"></div></div>
+    <div class="ps">
+      <span class="pl">基本信息</span>
+      <div class="pr" style="margin-bottom:.7rem">
+        <div style="flex:0 0 54px"><div style="font-size:.6rem;color:var(--muted);margin-bottom:2px">图标</div><input class="pi" id="pi-em" style="text-align:center;font-size:1.25rem" oninput="plive()"></div>
+        <div style="flex:1"><div style="font-size:.6rem;color:var(--muted);margin-bottom:2px">产品名称</div><input class="pi" id="pi-nm" oninput="plive()"></div>
+      </div>
+      <div class="pr">
+        <div style="flex:1"><div style="font-size:.6rem;color:var(--muted);margin-bottom:2px">品类</div>
+          <select class="pi" id="pi-ct"><option value="robot">🤖 机器人</option><option value="health">💊 健康穿戴</option><option value="compute">🖥 AI算力</option><option value="home">🏠 智能家居</option><option value="sport">🚴 运动出行</option><option value="edu">🎓 教育开发</option><option value="xr">🥽 XR显示</option></select>
+        </div>
+        <div style="flex:1"><div style="font-size:.6rem;color:var(--muted);margin-bottom:2px">状态</div>
+          <select class="pi" id="pi-st"><option value="done">✅ 已成功</option><option value="active">🚀 众筹中</option><option value="ship">📦 交付中</option></select>
+        </div>
+        <div style="flex:0 0 86px"><div style="font-size:.6rem;color:var(--muted);margin-bottom:2px">融资金额</div><input class="pi" id="pi-am"></div>
+      </div>
+    </div>
+    <div class="ps"><span class="pl">核心 Hook</span><textarea class="pi" id="pi-hk" rows="2"></textarea></div>
+    <div class="ps"><span class="pl">产品描述</span><textarea class="pi" id="pi-ds" rows="4"></textarea></div>
+    <div class="ps">
+      <span class="pl">四大壁垒分析</span>
+      <div style="display:flex;flex-direction:column;gap:.45rem">
+        <div><div style="font-size:.6rem;color:var(--muted);margin-bottom:2px">🏦 商业壁垒</div><textarea class="pi" id="pb-0" rows="2"></textarea></div>
+        <div><div style="font-size:.6rem;color:var(--muted);margin-bottom:2px">⚙️ 技术壁垒</div><textarea class="pi" id="pb-1" rows="2"></textarea></div>
+        <div><div style="font-size:.6rem;color:var(--muted);margin-bottom:2px">📣 获客壁垒</div><textarea class="pi" id="pb-2" rows="2"></textarea></div>
+        <div><div style="font-size:.6rem;color:var(--muted);margin-bottom:2px">🧠 用户壁垒</div><textarea class="pi" id="pb-3" rows="2"></textarea></div>
+      </div>
+    </div>
+    <div class="ps">
+      <span class="pl">存活预测 & 迭代建议</span>
+      <div class="pr">
+        <div style="flex:0 0 108px"><div style="font-size:.6rem;color:var(--muted);margin-bottom:2px">存活率 (0–100)</div><input class="pi" id="pi-sv" type="number" min="0" max="100"></div>
+        <div style="flex:1"><div style="font-size:.6rem;color:var(--muted);margin-bottom:2px">迭代建议</div><textarea class="pi" id="pi-ad" rows="3"></textarea></div>
+      </div>
+    </div>
+    <div class="ps"><span class="pl">中国市场本土化策略</span><textarea class="pi" id="pi-cn" rows="3" placeholder="针对中国市场的具体建议..."></textarea></div>
+    <div class="ps">
+      <span class="pl">相关链接</span>
+      <div class="link-row">
+        <span class="link-icon">🌐</span>
+        <input class="link-inp" id="pi-url-official" placeholder="官方网站  https://..." oninput="updLinkBtn('official')">
+        <a class="link-go disabled" id="lb-official" href="#" target="_blank" title="打开链接">↗</a>
+      </div>
+      <div class="link-row">
+        <span class="link-icon">▶️</span>
+        <input class="link-inp" id="pi-url-yt1" placeholder="YouTube 测评 1  https://..." oninput="updLinkBtn('yt1')">
+        <a class="link-go disabled" id="lb-yt1" href="#" target="_blank" title="打开链接">↗</a>
+      </div>
+      <div class="link-row">
+        <span class="link-icon">▶️</span>
+        <input class="link-inp" id="pi-url-yt2" placeholder="YouTube 测评 2  https://..." oninput="updLinkBtn('yt2')">
+        <a class="link-go disabled" id="lb-yt2" href="#" target="_blank" title="打开链接">↗</a>
+      </div>
+      <div class="link-row">
+        <span class="link-icon">🛒</span>
+        <input class="link-inp" id="pi-url-ks" placeholder="Kickstarter / Indiegogo  https://..." oninput="updLinkBtn('ks')">
+        <a class="link-go disabled" id="lb-ks" href="#" target="_blank" title="打开链接">↗</a>
+      </div>
+    </div>
+  </div>
+  <div class="pfoot">
+    <button class="btn bc" style="flex:1" onclick="applyP()">✓ 应用修改</button>
+    <button class="btn bo" onclick="closeP()">取消</button>
+  </div>
+</div>
+
+
+<!-- SETTINGS MODAL -->
+<div id="settings-overlay">
+  <div id="settings-modal">
+    <div class="sm-head">
+      <div class="sm-title">⚙️ 前端展示设置</div>
+      <button class="sm-x" onclick="closeSettings()">✕</button>
+    </div>
+    <div class="sm-body">
+
+      <div class="sm-sec">
+        <span class="sm-lbl">⭐ 重点关注 — 选择5个产品</span>
+        <p class="sm-desc">前端报告顶部会展示这5个产品作为编辑精选。点击下方格子可更换。当前已选：<span id="feat-count" style="color:var(--amber)">0/5</span></p>
+        <div class="featured-grid" id="feat-slots"></div>
+        <input class="pp-search" id="pp-search" placeholder="搜索产品..." oninput="renderPicker()" style="border-radius:6px 6px 0 0;margin-top:8px">
+        <div class="prod-picker" id="prod-picker"></div>
+      </div>
+
+      <div class="sm-sec">
+        <span class="sm-lbl">🐉 微信硬件板块</span>
+        <div class="toggle-row">
+          <div>
+            <div class="toggle-label">显示「微信做AI硬件」章节</div>
+            <div class="toggle-sub">关闭后前端报告不显示该章节，适合对外展示时隐藏草稿内容</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="toggle-wechat" checked onchange="updateWechatToggle()">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+
+    </div>
+    <div class="sm-foot">
+      <button class="btn bc" style="flex:1" onclick="saveSettings()">✓ 保存设置</button>
+      <button class="btn bo" onclick="closeSettings()">取消</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const CATS={robot:'机器人',health:'健康穿戴',compute:'AI算力',home:'智能家居',sport:'运动出行',edu:'教育开发',xr:'XR显示'};
+const SL={1:'低关注',2:'有潜力',3:'值得追踪',4:'重点关注',5:'核心研究对象'};
+
+let data=[
+{id:1,name:"Olares One",emoji:"🖥",hook:"NVIDIA 5090M驱动的本地个人AI云，数据不出门",amount:"$2.3M+",status:"done",cat:"compute",star:5,desc:"一台桌面AI工作站，配备NVIDIA GeForce RTX 5090M显卡，运行Olares开源操作系统。用户可在本地运行大型语言模型、AI Agent，所有数据留存本地，不依赖任何云服务。",barriers:["技术：开源OS生态 + 专属硬件形成双重锁定","商业：硬件一次性收入，未来潜在订阅服务","获客：科技媒体自传播强，主流用户触达弱","用户：数据不出门创造高迁移成本"],survival:85,advice:"聚焦企业级隐私计算场景，与AI开发者工具链深度整合，建立应用开发者生态系统。",china:""},
+{id:2,name:"Rokid Glasses",emoji:"🥽",hook:"双眼Micro LED显示AI XR眼镜，开放生态",amount:"$4M+",status:"done",cat:"xr",star:5,desc:"49克全功能AI AR眼镜，搭载12MP摄像头、双眼Micro LED波导显示、实时89语言翻译。Kickstarter XR品类历史最高融资记录。",barriers:["技术：Micro LED波导专利保护","商业：硬件销售+开放SDK生态","获客：媒体曝光极强，Times Square快闪活动","用户：多语言翻译创造刚需用户"],survival:78,advice:"聚焦B端商务翻译和企业培训场景，这是消费级AR眼镜最快商业化的路径。",china:""},
+{id:3,name:"Ropet AI Pet",emoji:"🐾",hook:"模仿生物反馈的下一代AI电子宠物",amount:"HK$2.4M",status:"ship",cat:"robot",star:5,desc:"毛茸茸的桌面AI宠物，体温37.5°C，多模态感知用户情绪，自我进化个性。斯坦福博士联合创始，ByteDance、微软团队核心成员。",barriers:["技术：生物反馈算法 + 40+专利","商业：硬件销售，外观订制付费潜力大","获客：女性用户TikTok自发传播","用户：情感依附创造极高迁移成本"],survival:82,advice:"快速推出宠物个性订阅服务，让AI角色随时间成长进化。",china:""},
+{id:4,name:"Tachyon SBC",emoji:"📡",hook:"自带Snapdragon NPU的5G单板电脑",amount:"$500k+",status:"done",cat:"compute",star:3,desc:"Particle公司开发的5G单板电脑，搭载高通QCM6490芯片（12 TOPS AI算力），信用卡大小，支持Ubuntu 24.04，专为边缘AI推理设计。",barriers:["技术：高通芯片供应链关系","商业：硬件+Particle IoT平台订阅","获客：开发者社区口碑传播","用户：开发者工具链依赖"],survival:70,advice:"深化与工业IoT客户的合作，边缘AI在制造业和医疗设备领域的需求正在爆发。",china:""},
+{id:5,name:"RingConn Gen 2",emoji:"💍",hook:"全球最薄AI深度睡眠康复建议智能戒指",amount:"$1M+",status:"ship",cat:"health",star:4,desc:"业界最薄最轻智能戒指，AI驱动的睡眠健康分析，12天超长续航，无订阅费。专注于睡眠康复建议而非简单数据展示。",barriers:["技术：超薄传感器封装工艺","商业：硬件一次性购买，数据分析增值","获客：健康KOL口碑传播","用户：历史睡眠数据积累"],survival:75,advice:"开发睡眠改善处方功能，与医疗机构合作背书，进入医疗保险报销体系。",china:""},
+{id:6,name:"BUG Ethical Hacking",emoji:"🔓",hook:"AI语音控制黑客终端，降低渗透测试门槛",amount:"$300k+",status:"done",cat:"edu",star:2,desc:"USB形态的AI驱动渗透测试工具，支持Wi-Fi分析、BLE扫描、GPT辅助脚本生成，语音控制操作。面向道德黑客和网络安全研究人员。",barriers:["技术：安全工具算法库","商业：硬件一次性，培训课程潜力","获客：安全社区口碑","用户：专业工具依赖"],survival:60,advice:"建立企业安全培训订阅服务，将工具扩展为网络安全学习平台。",china:""},
+{id:7,name:"iKKO Mind One",emoji:"📱",hook:"信用卡大小AI备用手机，自带免费全球流量",amount:"$200k+",status:"done",cat:"compute",star:3,desc:"全球最小4G Android手机，4.02英寸AMOLED屏，内置60+国家免费AI网络，180°翻转索尼摄像头，Hi-Fi DAC音频，物理QWERTY键盘。",barriers:["技术：全球流量协议资源","商业：硬件销售+流量套餐","获客：旅行和商务人群精准传播","用户：流量依赖粘性"],survival:55,advice:"聚焦商务人士的隐私副机场景，与企业VPN和安全解决方案捆绑销售。",china:""},
+{id:8,name:"Nexus GPU Expansion",emoji:"🖥",hook:"为NAS增加服务器级GPU扩展，实现家庭大模型",amount:"$400k+",status:"done",cat:"compute",star:4,desc:"将服务器级GPU集成到家庭NAS的扩展坞，AMD Ryzen 7主板，双10GbE，支持ZFS，完全开源平台。让普通用户在家运行大型AI模型。",barriers:["技术：开源平台生态","商业：硬件一次性购买","获客：自建AI服务器社区","用户：数据和配置迁移成本高"],survival:65,advice:"推出托管云服务选项，让不具备运维能力的用户也能享受本地AI算力。",china:""},
+{id:9,name:"ALPON X5",emoji:"🍓",hook:"树莓派生态下的边缘AI算力底座",amount:"$150k",status:"done",cat:"compute",star:2,desc:"Sixfab公司开发，基于树莓派的边缘AI计算平台，集成蜂窝网络连接，面向工业IoT和AI推理场景的开发者工具。",barriers:["技术：树莓派生态整合能力","商业：硬件+平台订阅","获客：Maker社区传播","用户：开发者生态依赖"],survival:58,advice:"聚焦农业IoT和智慧城市应用，与系统集成商建立分销伙伴关系。",china:""},
+{id:10,name:"LCMD MicroServer",emoji:"🗄",hook:"专为个人隐私定制的微型AI服务器",amount:"$120k",status:"done",cat:"compute",star:3,desc:"香港团队开发，Intel i5处理器，64GB DDR5内存，全SSD存储（最高96TB），内置2000+应用，专注个人隐私数据主权。",barriers:["技术：应用生态整合","商业：硬件一次性","获客：香港/台湾隐私意识用户","用户：数据迁移成本"],survival:52,advice:"开发企业版本，聚焦金融和医疗等合规敏感行业的私有化部署需求。",china:""},
+{id:11,name:"Doly Robotic",emoji:"🤖",hook:"基于树莓派的开源情绪桌面机器人",amount:"CA$300k",status:"done",cat:"robot",star:3,desc:"加拿大团队，开源AI桌面机器人，树莓派驱动，可表达情绪、进行语音交互，面向开发者和教育市场。",barriers:["技术：开源社区贡献","商业：硬件+教育课程","获客：Maker和教育社区","用户：开源生态依赖"],survival:62,advice:"与K-12教育机构合作，将机器人整合为编程和AI教育的实体教具。",china:""},
+{id:12,name:"CUDIS Ring",emoji:"⚡",hook:"健康赚币机制的AI戒指，激励运动",amount:"$1M",status:"ship",cat:"health",star:4,desc:"基于Solana区块链的AI健康戒指，用户通过健康行为赚取CUDIS代币，AI Coach提供个性化健康计划。已有50位奥运选手背书，超过25万用户。",barriers:["技术：AI健康算法+区块链激励","商业：硬件+代币经济+订阅","获客：Web3社区+运动员背书","用户：代币激励+健康数据积累"],survival:68,advice:"开发企业员工健康计划版本，与保险公司合作降低健康风险溢价。",china:""},
+{id:13,name:"ORIGINAL+ Skis",emoji:"⛷",hook:"AI根据用户滑雪习惯定制物理结构的滑雪板",amount:"$100k+",status:"done",cat:"sport",star:3,desc:"世界首创AI定制滑雪板，通过分析用户滑雪动作数据，定制滑雪板的物理弯曲弧度和硬度。将数字个性化引入传统运动装备。",barriers:["技术：AI物理参数优化算法","商业：高端定制溢价","获客：专业滑雪圈口碑","用户：定制数据积累"],survival:45,advice:"开发滑雪培训订阅服务，用传感器数据持续优化设备配置建议。",china:""},
+{id:14,name:"Hitch AI Bottle",emoji:"💧",hook:"根据AI活动量建议补水量的智能水壶",amount:"$80k",status:"done",cat:"home",star:1,desc:"AI驱动的智能补水提醒水壶，根据用户当日运动量、天气和个人数据计算个性化补水目标，通过应用发送提醒。",barriers:["技术：算法简单，壁垒极低","商业：硬件一次性，竞争激烈","获客：健康生活媒体曝光","用户：几乎无迁移成本"],survival:30,advice:"转型为健身生态系统配件，与健康手环深度整合，找到分销伙伴而非独立存活。",china:""},
+{id:15,name:"Unitree Go2",emoji:"🐕",hook:"NPU加速步态算法的消费级四足机器人",amount:"$1M+",status:"done",cat:"robot",star:5,desc:"宇树科技消费级四足机器人，4D超宽LiDAR，LLM语音控制，2.5m/s+速度，支持Python编程和ROS2，全球机器狗销量领先。",barriers:["技术：步态算法+自研关节电机","商业：硬件销售+教育版授权","获客：机器人媒体+B站爆款","用户：开发者生态深度绑定"],survival:90,advice:"加速教育版和企业安防巡检版本，这是市场规模最大的两个垂直场景。",china:""},
+{id:16,name:"Petoi Bittle X",emoji:"🦮",hook:"OpenAI接口驱动的教育类AI机器狗",amount:"$200k",status:"done",cat:"edu",star:4,desc:"掌心大小的AI机器狗，支持语音控制、姿态识别、Python/C++/Scratch编程，基于开源OpenCat平台，被全球顶尖大学用于机器人研究。",barriers:["技术：OpenCat开源生态，GitHub最多star","商业：教育市场+开发者社区","获客：大学研究院+STEM教育渠道","用户：开源代码依赖+社区粘性"],survival:80,advice:"与K-12和大学建立长期课程授权合作，打造AI机器人STEM认证体系。",china:""},
+{id:17,name:"Zeroth Bot",emoji:"🦾",hook:"支持Python编程的人形AI开发底座",amount:"$150k",status:"done",cat:"edu",star:3,desc:"开源可编程人形机器人，支持语音命令、手势感应和Python编程，面向学生、研究人员和创客，是低成本人形机器人开发平台。",barriers:["技术：开源平台，社区贡献","商业：教育市场","获客：大学和创客社区","用户：代码和配置依赖"],survival:55,advice:"聚焦具身AI研究领域，与大学研究经费合作而非直接面向消费者。",china:""},
+{id:18,name:"NovaSmart Ring",emoji:"💫",hook:"嵌入ChatGPT-4o的时尚类交互戒指",amount:"$110k",status:"done",cat:"health",star:2,desc:"将ChatGPT-4o整合入钛合金智能戒指，支持手势控制、20+生物指标监测、7天续航，定位时尚健康穿戴，蓝宝石和钛金属两种材质。",barriers:["技术：整合AI API，自身壁垒较低","商业：硬件一次性","获客：时尚科技媒体","用户：历史健康数据"],survival:40,advice:"与珠宝或奢侈品牌联名合作，将技术功能包装成时尚声明，聚焦高端女性市场。",china:""},
+{id:19,name:"Zettlab AI NAS",emoji:"📁",hook:"AI自动整理家庭照片与文档的智能存储",amount:"$250k",status:"done",cat:"compute",star:3,desc:"基于Intel Core Ultra 5，支持本地LLM，AI自动分类照片、文档和视频，双10GbE网口，最高200TB存储，面向家庭数字资产管理。",barriers:["技术：本地AI处理差异化","商业：硬件一次性","获客：家庭存储社区","用户：历史数据和索引不可迁移"],survival:60,advice:"开发相册AI搜索的杀手级应用，让非技术用户也能轻松找回10年前的家庭照片。",china:""},
+{id:20,name:"OUROBOT",emoji:"💬",hook:"桌面治愈系聊天机器人，主打心理疏导",amount:"$90k",status:"done",cat:"robot",star:3,desc:"AI情感陪伴桌面机器人，整合ChatGPT，专注心理健康支持和情感疏导，具有情绪感知能力和愈合个性，面向孤独感和心理健康需求人群。",barriers:["技术：情感AI算法","商业：硬件+订阅潜力","获客：心理健康社区","用户：情感依赖"],survival:58,advice:"与心理咨询平台合作，将机器人定位为专业心理支持的补充，而非替代品。",china:""},
+{id:21,name:"StackChan",emoji:"🤖",hook:"M5Stack生态开源AI交互小车",amount:"$130k",status:"done",cat:"edu",star:2,desc:"M5Stack官方开源AI桌面机器人，可爱动画脸部，AI语音助手，智能家居控制，完全开源硬件和软件，面向Maker和日本可爱文化爱好者。",barriers:["技术：M5Stack生态整合","商业：硬件销售","获客：日本Maker社区","用户：开源生态依赖"],survival:65,advice:"深化智能家居控制场景，成为Matter生态系统的可爱AI控制节点。",china:""},
+{id:22,name:"Enabot EBO X",emoji:"👁",hook:"AI守护家庭老人的非摄像头移动底座",amount:"$800k+",status:"done",cat:"robot",star:4,desc:"CES 2023创新奖，具备ChatGPT、V-SLAM自主导航、4K防抖摄像头、Harman音响的家庭守护机器人。可检测老人跌倒、药物提醒、远程家庭通话。",barriers:["技术：V-SLAM + 人体姿态识别","商业：高价硬件，订阅潜力","获客：家庭关爱媒体曝光","用户：家庭安全依赖"],survival:72,advice:"聚焦老龄化社会需求，与保险公司合作提供家庭安全套餐，打入日本和北欧市场。",china:""},
+{id:23,name:"Circular Ring Slim",emoji:"⭕",hook:"业内最轻AI健康反馈穿戴设备",amount:"$500k+",status:"done",cat:"health",star:4,desc:"法国健康科技品牌，全球最薄最轻智能戒指（2.2mm/2克），AI健康助手Kira+，142项生物指标，无订阅费策略差异化，首创触觉导航。",barriers:["技术：超薄传感器封装工艺","商业：无订阅差异化 + Circular Coin激励","获客：欧洲健康媒体","用户：7项关键健康数据积累"],survival:70,advice:"开发医疗级应用，通过CE认证进入欧洲数字医疗报销体系。",china:""},
+{id:24,name:"AI Composter",emoji:"🌱",hook:"AI优化垃圾降解效率并分析土壤肥力",amount:"$300k",status:"done",cat:"home",star:2,desc:"THRiVE智能厨余堆肥机，2.5小时极速处理，AI精确管控温湿度，异物检测，完全无味密封，支持95%厨余垃圾类型。众筹15分钟达标。",barriers:["技术：AI温控优化，壁垒有限","商业：硬件一次性","获客：可持续生活媒体","用户：使用习惯"],survival:48,advice:"与物业和酒店连锁合作，推出商业版本，比消费级更大的利润空间。",china:""},
+{id:25,name:"LivingAI EMO",emoji:"😎",hook:"2025年现象级桌面AI陪伴机器人",amount:"$2M+",status:"done",cat:"robot",star:5,desc:"全球最成功的AI陪伴机器人，1000+表情和动作，面部识别（记忆10人），自主探索桌面，与EMO互联网联动，自动归位充电，全球热销。",barriers:["技术：情感AI + 自主行为算法","商业：硬件+内容更新","获客：TikTok病毒传播","用户：情感依赖，极高迁移成本"],survival:88,advice:"推出EMO家族（多机联动）和企业版（前台接待）扩展产品线，建立IP授权收入。",china:""},
+{id:26,name:"Vinabot Talking Frame",emoji:"🖼",hook:"让旧照片开口说话的AI相框",amount:"—",status:"active",cat:"home",star:4,desc:"AI驱动的数字相框，让历史照片能够讲述故事，通过声音克隆技术重现逝去亲人的声音，支持40+语言。CES展会上引发情感共鸣。",barriers:["技术：声音克隆+照片理解AI","商业：订阅内容服务","获客：情感营销极强","用户：家庭记忆，无可替代"],survival:75,advice:"开发数字遗产功能，允许用户为后代留下AI化的自我记忆。",china:""},
+{id:27,name:"Mirumi Companion",emoji:"🐾",hook:"CES 2025爆款，$118的纯情绪交互毛绒AI",amount:"—",status:"active",cat:"robot",star:4,desc:"Yukai Engineering出品，CES 2025展会现象级产品。极简设计，无语言输出，通过身体语言表达情绪。核心理念：陪伴不需要语言。",barriers:["技术：情绪表达算法","商业：低价高量","获客：CES媒体爆炸式传播","用户：情感依赖"],survival:72,advice:"与床上用品和婴儿产品品牌联名，进入礼品市场。",china:""},
+{id:28,name:"VITA RING",emoji:"⚡",hook:"主动式AI健康干预，非被动监测",amount:"—",status:"active",cat:"health",star:5,desc:"区别于所有智能戒指的被动监测，VITA RING主动干预：睡眠呼吸异常时震动提醒，心率异常时SOS警报，17+生物指标，7天续航。",barriers:["技术：主动干预算法","商业：医疗级差异化","获客：健康意识人群","用户：紧急救援依赖极高"],survival:78,advice:"申请医疗器械认证，与心脏科医院合作，进入可报销医疗设备市场。",china:""},
+{id:29,name:"Giada AI PC",emoji:"🖥",hook:"NUC规格边缘AI工作站，内置专用处理器",amount:"—",status:"active",cat:"compute",star:2,desc:"Giada Tech开发，Intel Ultra CPU + 集成AI GPU + NPU，Wi-Fi 7，紧凑NUC外形，专为边缘AI推理工作负载设计的桌面工作站。",barriers:["技术：专用AI加速器整合","商业：企业边缘计算","获客：B端直销","用户：企业IT依赖"],survival:58,advice:"聚焦工厂边缘计算和零售AI分析场景，通过系统集成商渠道销售。",china:""},
+{id:30,name:"CODE27 Livehouse",emoji:"🌟",hook:"3D全息AI虚拟人交互终端，主打二次元",amount:"—",status:"active",cat:"robot",star:5,desc:"SyBran Innovation开发的3D AI虚拟伴侣终端，用户可自定义角色外观和性格，多模态AI交互，IoT控制中枢，主打二次元和虚拟偶像文化。",barriers:["技术：3D全息显示+角色AI","商业：角色订阅+内容付费","获客：二次元圈子极强传播","用户：情感依赖+角色数据"],survival:70,advice:"开发虚拟偶像IP授权业务，与二次元内容平台合作，在中国市场潜力巨大。",china:""},
+{id:31,name:"EVO-IN-MOTION Kit",emoji:"🎓",hook:"专为神经网络微调设计的硬件教学套件",amount:"—",status:"active",cat:"edu",star:2,desc:"加拿大团队开发，专注于神经网络在计算机视觉领域的微调实战教学，包含完整硬件和项目化课程，面向AI工程师培训。",barriers:["技术：课程内容壁垒","商业：课程订阅","获客：工程师培训市场","用户：认证体系依赖"],survival:55,advice:"开发企业AI培训版本，与在线教育平台合作进行课程分发。",china:""},
+{id:32,name:"Solar AI Shades",emoji:"🪟",hook:"AI学习阳光轨迹自动优化室内热效率的窗帘",amount:"—",status:"active",cat:"home",star:3,desc:"Mado Dynamic开发，太阳能驱动电动窗帘，AI分析阳光轨迹和天气数据，自动调节遮光率以节省空调能耗，Matter智能家居兼容，无需打孔安装。",barriers:["技术：AI能耗优化算法","商业：硬件+能源节省服务","获客：可持续家居媒体","用户：使用习惯养成"],survival:68,advice:"与房地产开发商和物业管理公司合作大规模采购，进入绿色建筑认证体系。",china:""},
+{id:33,name:"AI Plant Guardian",emoji:"🌿",hook:"翻译植物生理需求的LLM传感器",amount:"—",status:"active",cat:"home",star:3,desc:"将植物土壤、光线、温湿度传感器数据喂给LLM，让植物能够用自然语言表达需求，AI主动发送护理建议。",barriers:["技术：传感器+LLM整合","商业：硬件+订阅","获客：植物爱好者社区","用户：习惯养成"],survival:55,advice:"与园艺电商平台合作，将设备作为高端植物购买的免费赠品，大幅降低获客成本。",china:""},
+{id:34,name:"HAX A4 Car Kit",emoji:"🚗",hook:"为老旧车辆提供本地AI语音控制的改装模块",amount:"—",status:"active",cat:"sport",star:3,desc:"HAX加速器项目，为无CarPlay/Android Auto的旧车提供AI车机改装套件，本地语音控制音乐、导航和通讯，安装只需几秒钟。",barriers:["技术：离线AI语音识别","商业：保险和汽车后市场","获客：汽车改装社区","用户：使用习惯"],survival:62,advice:"与保险公司合作，将安全驾驶数据接入保险折扣计划，创造额外价值。",china:""},
+{id:35,name:"Smart AI Bike Comp",emoji:"🚴",hook:"AI实时分析骑行体能并给出补给建议",amount:"—",status:"active",cat:"sport",star:3,desc:"CYCLEASY AI骑行电脑，6合1功能（骑行电脑+打气筒+前后灯），3.5英寸IPS显示屏，AI体能分析，GPS导航，实时补给和训练建议。",barriers:["技术：体能分析AI算法","商业：硬件一次性","获客：铁人三项和骑行社区","用户：训练数据积累"],survival:60,advice:"开发教练订阅服务，连接专业骑行教练和AI数据分析，打造高端训练平台。",china:""},
+{id:36,name:"Next-Step AI Kit",emoji:"👁",hook:"针对机器视觉开发的实战硬件包",amount:"—",status:"active",cat:"edu",star:2,desc:"机器视觉AI开发套件，包含摄像头、边缘AI芯片和完整教程，专注于实际项目训练而非理论学习，面向工程师和高级学生。",barriers:["技术：配套教程内容","商业：硬件+课程","获客：工程师社区","用户：项目依赖"],survival:52,advice:"与职业培训机构合作，推出政府补贴的AI技能认证项目。",china:""},
+{id:37,name:"AI Grill Master",emoji:"🔥",hook:"自动预测肉质熟度并调整火力的AI烧烤硬件",amount:"—",status:"active",cat:"home",star:2,desc:"Indiegogo项目，AI烧烤温控系统，通过多传感器实时监测肉类内部温度和表面状态，AI预测最佳出锅时机并自动调节火力。",barriers:["技术：食材熟度AI模型","商业：硬件+食谱订阅","获客：烧烤爱好者社区","用户：食谱和偏好数据"],survival:55,advice:"与高端BBQ品牌联名，将AI控制系统作为顶级烧烤设备的标配功能。",china:""},
+{id:38,name:"AI Posture Pro",emoji:"🪑",hook:"AI深度传感器矫正坐姿，无摄像头保护隐私",amount:"—",status:"active",cat:"health",star:4,desc:"使用深度传感器（非摄像头）实时分析用户坐姿，AI给出即时矫正建议，完全保护隐私。面向长时间久坐的办公室用户。",barriers:["技术：深度传感器姿态识别","商业：硬件+订阅","获客：远程办公和健康办公媒体","用户：健康数据和习惯"],survival:65,advice:"与企业员工福利计划合作，进入B端集采市场，同时申请雇主健康保险报销。",china:""},
+{id:39,name:"AI Scent Diffuser",emoji:"🌸",hook:"根据AI检测到的情绪压力自动调配气味",amount:"—",status:"active",cat:"home",star:2,desc:"AI情绪感知香薰扩散器，通过分析用户行为数据和环境传感器判断情绪状态，自动调配对应的精油配方，主动改善情绪环境。",barriers:["技术：情绪推断算法","商业：硬件+精油订阅","获客：wellness媒体","用户：精油订阅粘性"],survival:52,advice:"与冥想和正念App（Calm等）合作，成为其生态系统的智能硬件配件。",china:""},
+{id:40,name:"AI Aquarium Monitor",emoji:"🐠",hook:"AI预测鱼缸生态崩溃并给出换水建议",amount:"—",status:"active",cat:"home",star:2,desc:"Indiegogo项目，鱼缸生态智能监测，AI通过水质、温度、pH等多参数预测生态崩溃风险，提前3-7天预警，给出精确换水和投食建议。",barriers:["技术：水质AI预测模型","商业：硬件+传感器耗材","获客：水族爱好者社区","用户：鱼缸生态数据不可迁移"],survival:58,advice:"拓展到水产养殖商业场景，专业渔场对水质监测的付费意愿远高于个人用户。",china:""},
+{id:41,name:"AI Barista Desk",emoji:"☕",hook:"AI模拟顶级咖啡师手法的家庭冲泡平台",amount:"—",status:"active",cat:"home",star:3,desc:"AI驱动的家庭手冲咖啡平台，分析用户口感偏好，模拟世界顶级咖啡师的冲泡参数（水温、注水速度、时序），每次都能复现完美一杯。",barriers:["技术：冲泡参数AI优化","商业：硬件+精品咖啡豆订阅","获客：精品咖啡社区","用户：口感偏好数据"],survival:62,advice:"与蓝瓶咖啡等精品咖啡品牌合作，将设备作为顶级咖啡体验的入口。",china:""},
+{id:42,name:"AI Stargazer",emoji:"🔭",hook:"自动追踪并讲解星空背景知识的AI观星镜",amount:"—",status:"active",cat:"home",star:3,desc:"AI驱动的智能天文望远镜，自动识别并追踪天体，AI实时讲解天文知识，可连接手机直播，将复杂的天文观测变得平民化。",barriers:["技术：天体识别算法","商业：硬件+内容订阅","获客：天文爱好者社区","用户：观测记录积累"],survival:60,advice:"与学校天文课程合作，开发教育版套装，将产品推入STEM教育采购渠道。",china:""},
+{id:43,name:"AI E-Bike Dash",emoji:"🛵",hook:"针对外卖/长途骑行的AI路径优化显示器",amount:"—",status:"active",cat:"sport",star:3,desc:"专为电动自行车设计的AI仪表盘，实时路径优化（考虑交通、电量、天气），外卖骑手多订单路线规划，长途骑行体能管理，防盗警报。",barriers:["技术：多变量路径优化AI","商业：硬件+骑手订阅","获客：外卖骑手社区","用户：路径数据依赖"],survival:65,advice:"与美团、饿了么等平台合作，将AI路径优化与派单系统打通，成为B端标配设备。",china:""},
+{id:44,name:"AI Workout Mirror",emoji:"🏋",hook:"A3纸大小的AI健身辅助终端",amount:"—",status:"active",cat:"sport",star:3,desc:"超薄A3尺寸AI健身镜，可贴墙安装，AI实时检测动作姿态，给出矫正建议，内置课程库，支持与私人教练视频连线，比Mirror小巧十倍。",barriers:["技术：姿态识别AI","商业：硬件+健身课程订阅","获客：家庭健身媒体","用户：课程内容粘性"],survival:62,advice:"推出AI私教订阅服务，将人工教练和AI建议结合，比纯AI产品更有说服力。",china:""},
+{id:45,name:"AI Chess Board Pro",emoji:"♟",hook:"与AI对弈时有物理力度反馈的棋盘",amount:"—",status:"active",cat:"home",star:3,desc:"AI驱动的智能象棋棋盘，棋子自动移动（内置磁性机械机构），AI实时分析棋局，提供策略建议，可连接Chess.com在线对局，棋子移动有力度反馈。",barriers:["技术：机械棋子移动精度","商业：硬件一次性","获客：象棋和棋类爱好者","用户：棋局数据分析"],survival:65,advice:"与国际象棋联合会合作，推出锦标赛训练版，开发AI棋力评估报告服务。",china:""},
+{id:46,name:"AI Soil Sensor",emoji:"🌾",hook:"农场级AI土壤养分实时监测硬件",amount:"—",status:"active",cat:"home",star:2,desc:"Indiegogo项目，农业级土壤传感器阵列，AI实时分析NPK养分、pH、湿度、温度，结合气象数据给出精准施肥和灌溉建议，支持大面积农场部署。",barriers:["技术：农业AI模型","商业：传感器耗材+SaaS","获客：农业科技渠道","用户：土壤历史数据"],survival:60,advice:"与化肥和农药公司合作，用精准农业减少化学品用量，成为ESG报告的数据来源。",china:""},
+{id:47,name:"AI Sleep Mask v3",emoji:"😴",hook:"根据脑电波AI调节光线与白噪音的眼罩",amount:"—",status:"active",cat:"health",star:4,desc:"DreamPilot AI睡眠眼罩，内置EEG脑电波传感器，AI实时监测睡眠深度，自适应调节白噪音、热敷和按摩强度，AI睡眠报告，100%遮光设计。",barriers:["技术：EEG信号处理+AI","商业：硬件+睡眠订阅","获客：睡眠健康媒体","用户：个人睡眠数据"],survival:70,advice:"与睡眠诊所合作，将EEG数据用于轻度睡眠障碍的非药物干预，建立医疗背书。",china:""},
+{id:48,name:"AI Backpack",emoji:"🎒",hook:"AI自动负载平衡提醒与内部物品检索功能",amount:"—",status:"active",cat:"home",star:1,desc:"内置压力传感器和物品识别系统的AI背包，实时监测负载分布，提醒姿势调整，AI记忆物品存放位置，支持语音查询我的钥匙在哪里。",barriers:["技术：物品识别传感器","商业：高端背包市场","获客：城市通勤者","用户：物品记忆数据"],survival:45,advice:"与高端旅行箱包品牌合作OEM，定位商旅人士的智能出行配件而非独立品牌。",china:""},
+{id:49,name:"AI Pet Feeder Health",emoji:"🐕",hook:"AI分析宠物进食速度变化进行预警",amount:"—",status:"active",cat:"home",star:3,desc:"智能宠物喂食器，AI通过摄像头和重量传感器分析宠物进食速度、食量变化，建立健康基线，异常时提前预警可能的健康问题。",barriers:["技术：宠物行为AI识别","商业：硬件+宠物粮订阅","获客：宠物主人社区","用户：宠物健康历史数据"],survival:65,advice:"与宠物保险公司合作，将设备纳入保险福利，用数据降低理赔率。",china:""},
+{id:50,name:"AI Coding Mastery",emoji:"💻",hook:"结合物理硬件的AI编程学习终端",amount:"—",status:"active",cat:"edu",star:2,desc:"AI驱动的实体编程学习终端，通过物理按钮和显示屏与AI编程教练交互，AI根据学习进度个性化调整教学路径，让编程学习更直观有触感。",barriers:["技术：个性化学习AI","商业：硬件+课程订阅","获客：编程教育市场","用户：学习进度数据"],survival:55,advice:"与编程教育机构合作，将硬件作为线下课程的辅助工具，进入To B教育采购。",china:""}
+];
+
+let edited=new Set(),currentF='all',currentS='id',currentPID=null;
+
+// Ensure all products have a links field
+data.forEach(p=>{ if(!p.links) p.links={official:'',yt1:'',yt2:'',ks:''}; });
+
+function h(s){return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function setF(f,el){
+  currentF=f;
+  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('active'));
+  if(el)el.classList.add('active');
+  document.getElementById('crumb').textContent=el?el.textContent.trim():'全部产品';
+  render();
+}
+function setS(s,el){
+  currentS=s;
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+  if(el)el.classList.add('active');
+  render();
+}
+
+function render(){
+  const q=document.getElementById('q').value.toLowerCase();
+  let rows=[...data];
+  if(currentF==='__ed__') rows=rows.filter(p=>edited.has(p.id));
+  else if(currentF==='star5') rows=rows.filter(p=>p.star===5);
+  else if(currentF==='star4') rows=rows.filter(p=>p.star>=4);
+  else if(['done','active','ship'].includes(currentF)) rows=rows.filter(p=>p.status===currentF);
+  else if(currentF!=='all') rows=rows.filter(p=>p.cat===currentF);
+  if(q) rows=rows.filter(p=>p.name.toLowerCase().includes(q)||p.hook.toLowerCase().includes(q)||p.desc.toLowerCase().includes(q));
+  if(currentS==='star') rows.sort((a,b)=>b.star-a.star);
+  else if(currentS==='surv') rows.sort((a,b)=>b.survival-a.survival);
+  else rows.sort((a,b)=>a.id-b.id);
+
+  const tbody=document.getElementById('tbody');
+  const empty=document.getElementById('empty');
+  if(!rows.length){tbody.innerHTML='';empty.style.display='block';return;}
+  empty.style.display='none';
+
+  tbody.innerHTML=rows.map(p=>{
+    const sc=p.survival>=70?'shi':p.survival>=50?'smi':'slo';
+    const isEd=edited.has(p.id);
+    return `<tr id="r${p.id}" class="${isEd?'ed':''}">
+      <td><span style="font-family:'Space Mono',monospace;font-size:.62rem;color:var(--muted)">${p.id<=25?'✅':'🚀'} ${p.id}</span></td>
+      <td><div class="stars" id="st${p.id}">${[1,2,3,4,5].map(i=>`<span class="star ${p.star>=i?'lit':''}" onclick="setStar(${p.id},${i})" title="${i}★: ${SL[i]}">★</span>`).join('')}</div></td>
+      <td><input class="ein" style="width:34px;text-align:center;font-size:1.1rem;padding:.18rem .2rem" value="${h(p.emoji)}" onchange="ef(${p.id},'emoji',this.value)"></td>
+      <td><input class="ein" value="${h(p.name)}" onchange="ef(${p.id},'name',this.value)" style="font-weight:600;font-size:.8rem"></td>
+      <td><select class="ein" style="font-size:.72rem" onchange="ef(${p.id},'cat',this.value)">${Object.entries(CATS).map(([k,v])=>`<option value="${k}"${p.cat===k?' selected':''}>${v}</option>`).join('')}</select></td>
+      <td><select class="ein" style="font-size:.7rem" onchange="ef(${p.id},'status',this.value)"><option value="done"${p.status==='done'?' selected':''}>✅ 已成功</option><option value="active"${p.status==='active'?' selected':''}>🚀 众筹中</option><option value="ship"${p.status==='ship'?' selected':''}>📦 交付中</option></select></td>
+      <td><input class="emono" value="${h(p.amount)}" onchange="ef(${p.id},'amount',this.value)"></td>
+      <td><input class="ein" value="${h(p.hook)}" onchange="ef(${p.id},'hook',this.value)" style="font-size:.76rem"></td>
+      <td><div class="sw2"><div class="sb"><div class="sf ${sc}" style="width:${p.survival}%"></div></div><input class="emono" style="width:34px" type="number" min="0" max="100" value="${p.survival}" onchange="ef(${p.id},'survival',+this.value)"><span class="snum">%</span></div></td>
+      <td><button class="ab" onclick="openP(${p.id})" title="编辑详情">✏️</button></td>
+    </tr>`;
+  }).join('');
+  updStats();
+}
+
+function ef(id,field,val){
+  const p=data.find(x=>x.id===id);
+  if(!p)return;
+  p[field]=val;
+  markEd(id);
+}
+
+function setStar(id,val){
+  const p=data.find(x=>x.id===id);
+  if(!p)return;
+  p.star=val;
+  markEd(id);
+  const el=document.getElementById('st'+id);
+  if(el)el.querySelectorAll('.star').forEach((s,i)=>s.classList.toggle('lit',val>=i+1));
+  if(currentPID===id)renderBStars(val);
+}
+
+function markEd(id){
+  edited.add(id);
+  const r=document.getElementById('r'+id);
+  if(r)r.classList.add('ed');
+  document.getElementById('ubadge').classList.add('show');
+  updStats();
+}
+
+function updStats(){
+  document.getElementById('sn-t').textContent=data.length;
+  document.getElementById('sn-e').textContent=edited.size;
+  const counts={};Object.keys(CATS).forEach(k=>counts[k]=0);
+  data.forEach(p=>{if(counts[p.cat]!==undefined)counts[p.cat]++;});
+  document.getElementById('nc-all').textContent=data.length;
+  Object.entries(counts).forEach(([k,v])=>{const el=document.getElementById('nc-'+k);if(el)el.textContent=v;});
+}
+
+// ── PANEL ──
+function openP(id){
+  const p=data.find(x=>x.id===id);if(!p)return;
+  currentPID=id;
+  document.getElementById('pe').textContent=p.emoji;
+  document.getElementById('pn').textContent=p.name;
+  document.getElementById('pm').textContent=`${CATS[p.cat]} · #${p.id} · ${p.status==='done'?'已成功':p.status==='active'?'众筹中':'交付中'}`;
+  document.getElementById('pi-em').value=p.emoji;
+  document.getElementById('pi-nm').value=p.name;
+  document.getElementById('pi-ct').value=p.cat;
+  document.getElementById('pi-st').value=p.status;
+  document.getElementById('pi-am').value=p.amount;
+  document.getElementById('pi-hk').value=p.hook;
+  document.getElementById('pi-ds').value=p.desc;
+  document.getElementById('pi-sv').value=p.survival;
+  document.getElementById('pi-ad').value=p.advice;
+  document.getElementById('pi-cn').value=p.china||'';
+  (p.barriers||[]).forEach((b,i)=>{const el=document.getElementById('pb-'+i);if(el)el.value=b;});
+  // Links
+  const lk=p.links||{};
+  ['official','yt1','yt2','ks'].forEach(k=>{
+    const el=document.getElementById('pi-url-'+k);
+    if(el){el.value=lk[k]||'';updLinkBtn(k);}
+  });
+  renderBStars(p.star);
+  document.getElementById('panel').classList.add('open');
+}
+
+function renderBStars(val){
+  const hints={1:'低关注 — 暂不优先',2:'有潜力 — 持续观察',3:'值得追踪 — 纳入研究',4:'重点关注 — 深度分析',5:'核心对象 — 必须研究'};
+  document.getElementById('bstars').innerHTML=[1,2,3,4,5].map(i=>`<span class="bs ${val>=i?'lit':''}" onclick="pStar(${i})">★</span>`).join('')+`<span class="sht">${hints[val]||''}</span>`;
+}
+
+function pStar(val){
+  const p=data.find(x=>x.id===currentPID);if(!p)return;
+  p.star=val;markEd(currentPID);renderBStars(val);
+  const el=document.getElementById('st'+currentPID);
+  if(el)el.querySelectorAll('.star').forEach((s,i)=>s.classList.toggle('lit',val>=i+1));
+}
+
+function plive(){
+  const n=document.getElementById('pi-nm').value;
+  const e=document.getElementById('pi-em').value;
+  document.getElementById('pn').textContent=n;
+  document.getElementById('pe').textContent=e;
+}
+
+function applyP(){
+  const p=data.find(x=>x.id===currentPID);if(!p)return;
+  p.emoji=document.getElementById('pi-em').value;
+  p.name=document.getElementById('pi-nm').value;
+  p.cat=document.getElementById('pi-ct').value;
+  p.status=document.getElementById('pi-st').value;
+  p.amount=document.getElementById('pi-am').value;
+  p.hook=document.getElementById('pi-hk').value;
+  p.desc=document.getElementById('pi-ds').value;
+  p.survival=parseInt(document.getElementById('pi-sv').value)||0;
+  p.advice=document.getElementById('pi-ad').value;
+  p.china=document.getElementById('pi-cn').value;
+  [0,1,2,3].forEach(i=>{const el=document.getElementById('pb-'+i);if(el)p.barriers[i]=el.value;});
+  // Links
+  if(!p.links)p.links={};
+  ['official','yt1','yt2','ks'].forEach(k=>{
+    const el=document.getElementById('pi-url-'+k);
+    if(el)p.links[k]=el.value.trim();
+  });
+  markEd(currentPID);
+  render();
+  closeP();
+  toast('✓ 修改已应用');
+}
+
+function closeP(){document.getElementById('panel').classList.remove('open');currentPID=null;}
+
+// ── SAVE / EXPORT ──
+function saveAll(){
+  localStorage.setItem('ai-hw-admin',JSON.stringify(data));
+  edited.clear();
+  document.getElementById('ubadge').classList.remove('show');
+  document.querySelectorAll('tbody tr').forEach(r=>r.classList.remove('ed'));
+  updStats();
+  toast('💾 已保存到本地存储');
+}
+
+function exportJSON(){
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download='ai-hw-products.json';a.click();
+  URL.revokeObjectURL(url);
+  toast('📤 JSON 文件已导出');
+}
+
+function resetAll(){
+  if(!confirm('确定要重置所有修改吗？此操作不可撤销。'))return;
+  localStorage.removeItem('ai-hw-admin');
+  location.reload();
+}
+
+function updLinkBtn(k){
+  const inp=document.getElementById('pi-url-'+k);
+  const btn=document.getElementById('lb-'+k);
+  if(!inp||!btn)return;
+  const val=inp.value.trim();
+  const valid=val.startsWith('http://') || val.startsWith('https://');
+  btn.href=valid?val:'#';
+  btn.classList.toggle('disabled',!valid);
+}
+
+let toastT;
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+
+// ── SETTINGS ──
+let cfg = { featuredIds: [15,25,3,2,28], showWechat: true };
+try { const s = localStorage.getItem('ai-hw-config'); if(s) cfg = {...cfg, ...JSON.parse(s)}; } catch(e){}
+
+let pickingSlot = null; // which slot index is being picked (0-4)
+
+function openSettings(){
+  renderFeatSlots();
+  renderPicker();
+  document.getElementById('toggle-wechat').checked = cfg.showWechat;
+  document.getElementById('settings-overlay').classList.add('open');
+}
+function closeSettings(){ document.getElementById('settings-overlay').classList.remove('open'); }
+
+function renderFeatSlots(){
+  const slots = document.getElementById('feat-slots');
+  slots.innerHTML = [0,1,2,3,4].map(i => {
+    const id = cfg.featuredIds[i];
+    const p = id ? data.find(d => d.id === id) : null;
+    return `<div class="feat-slot ${p?'filled':'empty'}" onclick="pickSlot(${i})" title="${p?'点击更换':'点击选择'}">
+      <div class="feat-rank">TOP ${i+1}</div>
+      ${p ? `<div class="feat-emoji">${p.emoji}</div><div class="feat-name">${p.name}</div>` : '<div class="feat-name" style="color:var(--muted)">点击选择</div>'}
+    </div>`;
+  }).join('');
+  document.getElementById('feat-count').textContent = cfg.featuredIds.filter(Boolean).length + '/5';
+}
+
+function pickSlot(i){
+  pickingSlot = i;
+  // Highlight the active slot
+  document.querySelectorAll('.feat-slot').forEach((s,j) => {
+    s.style.outline = j===i ? '2px solid var(--cyan)' : 'none';
+  });
+  document.getElementById('pp-search').focus();
+}
+
+function renderPicker(){
+  const q = document.getElementById('pp-search').value.toLowerCase();
+  const picker = document.getElementById('prod-picker');
+  const list = data.filter(p => !q || p.name.toLowerCase().includes(q) || p.hook.toLowerCase().includes(q));
+  picker.innerHTML = list.map(p => {
+    const inFeat = cfg.featuredIds.includes(p.id);
+    const slotIdx = cfg.featuredIds.indexOf(p.id);
+    return `<div class="pp-item ${inFeat?'selected':''}" onclick="selectFeat(${p.id})">
+      <span class="pp-em">${p.emoji}</span>
+      <span class="pp-nm">${p.name}</span>
+      ${inFeat ? `<span class="pp-st">TOP ${slotIdx+1}</span>` : ''}
+      <span style="font-size:0.65rem;color:var(--muted);font-family:'Space Mono',monospace">${'★'.repeat(p.star)}</span>
+    </div>`;
+  }).join('');
+}
+
+function selectFeat(id){
+  if(pickingSlot === null){
+    // auto-assign to first empty slot
+    const empty = cfg.featuredIds.indexOf(undefined);
+    if(empty === -1 && cfg.featuredIds.length < 5) cfg.featuredIds.push(id);
+    else if(empty !== -1) cfg.featuredIds[empty] = id;
+    else return; // all 5 full
+  } else {
+    cfg.featuredIds[pickingSlot] = id;
+    pickingSlot = null;
+    document.querySelectorAll('.feat-slot').forEach(s => s.style.outline = 'none');
+  }
+  renderFeatSlots();
+  renderPicker();
+}
+
+function updateWechatToggle(){
+  cfg.showWechat = document.getElementById('toggle-wechat').checked;
+}
+
+function saveSettings(){
+  localStorage.setItem('ai-hw-config', JSON.stringify(cfg));
+  closeSettings();
+  toast('⚙️ 前端设置已保存，刷新报告页面生效');
+}
+
+document.getElementById('settings-overlay').addEventListener('click', e=>{
+  if(e.target===e.currentTarget) closeSettings();
+});
+
+// ── INIT ──
+(function(){
+  const saved=localStorage.getItem('ai-hw-admin');
+  if(saved){
+    try{
+      const parsed=JSON.parse(saved);
+      parsed.forEach(s=>{const idx=data.findIndex(d=>d.id===s.id);if(idx!==-1)data[idx]={...data[idx],...s};});
+      toast('📂 已恢复上次保存的数据');
+    }catch(e){}
+  }
+  render();
+})();
+</script>
+</body>
+</html>
